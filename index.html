@@ -12,22 +12,24 @@
 <style>
 /* Layout: playful hero with grade picker → grid of bright category tiles → the chosen category unfolds below as a full catalogue with filters. */
 :root{
-  --bg:#F6F4FF;
+  --bg:#EFF7FB;
   --surface:#FFFFFF;
-  --ink:#1C1838;
-  --muted:#635E80;
-  --line:#E2DEF3;
-  --soft:#EEEBFB;
-  --violet:#6B4EFF;
-  --c-olymp:#6B4EFF;  --t-olymp:#FFFFFF;
-  --c-math:#1E7BEF;   --t-math:#FFFFFF;
-  --c-lang:#F0457E;   --t-lang:#FFFFFF;
-  --c-code:#7CC414;   --t-code:#1A2A00;
-  --c-sci:#FF8A1F;    --t-sci:#2B1500;
-  --c-club:#FFC83D;   --t-club:#2B2000;
-  --c-summer:#22C3E6; --t-summer:#032B33;
-  --c-exam:#0F766E;   --t-exam:#FFFFFF;
-  --c-city:#1C1838;   --t-city:#FFFFFF;
+  --ink:#0F2A3B;
+  --muted:#52707F;
+  --line:#D5E7EF;
+  --soft:#E4F1F7;
+  --violet:#0A7FA3;
+  --art-op:.30;
+  --on-violet:#FFFFFF;
+  --c-olymp:#4457F5;  --t-olymp:#FFFFFF;
+  --c-math:#0A7FC9;   --t-math:#FFFFFF;
+  --c-lang:#EE4F78;   --t-lang:#FFFFFF;
+  --c-code:#5DB83A;   --t-code:#0F2600;
+  --c-sci:#FF8540;    --t-sci:#2B1300;
+  --c-club:#FEC50C;   --t-club:#2B2000;
+  --c-summer:#12B3C9; --t-summer:#02292F;
+  --c-exam:#0D7468;   --t-exam:#FFFFFF;
+  --c-city:#0F2A3B;   --t-city:#FFFFFF;
   --ok:#0E9F6E; --soon:#E08600;
   --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
   --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -35,14 +37,14 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#121029;--surface:#1B1838;--ink:#F1EEFF;--muted:#A9A3CC;--line:#2E2A55;--soft:#24204A;
-    --violet:#9C88FF;--c-olymp:#7C62FF;--c-exam:#14958A;--c-city:#F1EEFF;--t-city:#1C1838;--ok:#34D399;--soon:#FFB347;
+    --bg:#0B1823;--surface:#122536;--ink:#E9F5FA;--muted:#9BB6C4;--line:#21405A;--soft:#193247;--art-op:.22;--on-violet:#062430;
+    --violet:#4CC4E4;--c-olymp:#5D6EFF;--c-exam:#14958A;--c-city:#E9F5FA;--t-city:#0F2A3B;--ok:#34D399;--soon:#FFB347;
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#121029;--surface:#1B1838;--ink:#F1EEFF;--muted:#A9A3CC;--line:#2E2A55;--soft:#24204A;
-  --violet:#9C88FF;--c-olymp:#7C62FF;--c-exam:#14958A;--c-city:#F1EEFF;--t-city:#1C1838;--ok:#34D399;--soon:#FFB347;
+  --bg:#0B1823;--surface:#122536;--ink:#E9F5FA;--muted:#9BB6C4;--line:#21405A;--soft:#193247;--art-op:.22;--on-violet:#062430;
+  --violet:#4CC4E4;--c-olymp:#5D6EFF;--c-exam:#14958A;--c-city:#E9F5FA;--t-city:#0F2A3B;--ok:#34D399;--soon:#FFB347;
 }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-inline:clamp(16px,4vw,44px);padding-block:20px 60px}
@@ -77,8 +79,8 @@ button{font:inherit;color:inherit}
 .gbtn{cursor:pointer;border:2px solid transparent;background:var(--surface);border-radius:14px;padding:10px 0;font-family:var(--f-display);font-weight:800;font-size:20px;transition:transform .12s}
 .gbtn small{display:block;font-family:var(--f-body);font-size:11px;font-weight:700;color:var(--muted)}
 .gbtn:hover{transform:translateY(-2px)}
-.gbtn[aria-pressed="true"]{background:var(--violet);color:#fff;border-color:var(--violet)}
-.gbtn[aria-pressed="true"] small{color:#fff}
+.gbtn[aria-pressed="true"]{background:var(--violet);color:var(--on-violet);border-color:var(--violet)}
+.gbtn[aria-pressed="true"] small{color:var(--on-violet)}
 .grade-card .hint{font-size:13px;color:var(--muted);margin:0}
 
 /* categories */
@@ -150,6 +152,23 @@ button{font:inherit;color:inherit}
 .hidden-note{font-size:14px;color:var(--muted);font-weight:700}
 .hidden-note button{cursor:pointer;background:none;border:0;color:var(--violet);font-weight:800;text-decoration:underline;padding:0}
 footer{font-size:13px;color:var(--muted);max-width:80ch}
+/* background art: hand-drawn school doodles + Kazakh ornament, fixed behind everything */
+body{background:
+  radial-gradient(60vmax 40vmax at 100% 0%,color-mix(in srgb,var(--c-club) 16%,transparent),transparent 70%),
+  radial-gradient(50vmax 40vmax at 0% 100%,color-mix(in srgb,var(--c-summer) 16%,transparent),transparent 70%),
+  var(--bg);background-attachment:fixed}
+.bgart{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:var(--art-op)}
+.bgart svg{width:100%;height:100%;display:block}
+.bgart g{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.bgart text{font-family:var(--f-display);font-weight:800;stroke:none}
+.bgart .fl{animation:float 9s ease-in-out infinite alternate}
+.bgart .fl2{animation:float 12s ease-in-out infinite alternate-reverse}
+@keyframes float{to{transform:translateY(-14px)}}
+.wrap{position:relative;z-index:1}
+.hero{background:color-mix(in srgb,var(--surface) 86%,transparent);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.hero .art{position:absolute;pointer-events:none;opacity:.22}
+.hero .art g{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:820px){.hero .art.a2{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -160,6 +179,69 @@ footer{font-size:13px;color:var(--muted);max-width:80ch}
 .langs button{cursor:pointer;border:0;background:transparent;border-radius:999px;padding:5px 12px;font-weight:800;font-size:14px}
 .langs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 </style>
+<div class="bgart" aria-hidden="true">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <path id="spark" d="M0 -12 Q2 -2 12 0 Q2 2 0 12 Q-2 2 -12 0 Q-2 -2 0 -12Z"/>
+      <path id="horn" d="M0 6 C0 -26 -38 -30 -40 -2 C-41 16 -20 22 -14 9 C-10 0 -20 -6 -25 3 M0 6 C0 -26 38 -30 40 -2 C41 16 20 22 14 9 C10 0 20 -6 25 3 M0 6 V34 M-10 34 H10"/>
+    </defs>
+    <!-- open book -->
+    <g class="fl" stroke="var(--c-olymp)" transform="translate(70 120) rotate(-8)">
+      <path d="M0 12 Q28 0 56 12 Q84 0 112 12 V80 Q84 68 56 80 Q28 68 0 80 Z M56 12 V80 M14 30 Q28 25 42 30 M14 46 Q28 41 42 46 M70 30 Q84 25 98 30 M70 46 Q84 41 98 46"/>
+    </g>
+    <!-- atom -->
+    <g class="fl2" stroke="var(--c-summer)" transform="translate(1330 150)">
+      <ellipse rx="56" ry="20"/><ellipse rx="56" ry="20" transform="rotate(60)"/><ellipse rx="56" ry="20" transform="rotate(120)"/>
+      <circle r="7" fill="var(--c-summer)"/>
+    </g>
+    <!-- pencil -->
+    <g class="fl2" stroke="var(--c-sci)" transform="translate(60 640) rotate(-32)">
+      <rect width="120" height="24" rx="4"/><path d="M120 0 L148 12 L120 24 M138 7 V17 M22 0 V24"/>
+    </g>
+    <!-- light bulb -->
+    <g class="fl" stroke="var(--c-club)" transform="translate(1340 610)">
+      <path d="M-15 22 C-32 8 -30 -28 0 -30 C30 -28 32 8 15 22 V36 H-15 Z M-10 44 H10 M-6 52 H6 M-6 -6 L0 6 L6 -6"/>
+      <path d="M0 -46 V-58 M-36 -30 L-45 -38 M36 -30 L45 -38 M-46 2 H-58 M46 2 H58"/>
+    </g>
+    <!-- rocket -->
+    <g class="fl" stroke="var(--c-lang)" transform="translate(1220 820) rotate(28)">
+      <path d="M0 -54 C20 -32 22 0 15 22 H-15 C-22 0 -20 -32 0 -54Z"/><circle cy="-16" r="8"/>
+      <path d="M-15 4 L-30 28 L-15 22 M15 4 L30 28 L15 22 M-7 30 Q0 48 7 30"/>
+    </g>
+    <!-- globe -->
+    <g class="fl2" stroke="var(--c-math)" transform="translate(230 400)">
+      <circle r="38"/><ellipse rx="16" ry="38"/><path d="M-38 0 H38 M-32 -20 Q0 -12 32 -20 M-32 20 Q0 12 32 20 M0 38 V50 M-22 52 H22"/>
+    </g>
+    <!-- code brackets -->
+    <g stroke="var(--c-code)" transform="translate(1150 400)"><path d="M-26 -22 L-48 0 L-26 22 M26 -22 L48 0 L26 22 M10 -30 L-10 30"/></g>
+    <!-- formulas & letters -->
+    <text x="380" y="110" font-size="46" fill="var(--c-math)" transform="rotate(-10 380 110)">π</text>
+    <text x="1010" y="90" font-size="34" fill="var(--c-olymp)" transform="rotate(8 1010 90)">√x</text>
+    <text x="110" y="860" font-size="38" fill="var(--c-exam)" transform="rotate(-6 110 860)">Σ</text>
+    <text x="1290" y="420" font-size="30" fill="var(--c-sci)" transform="rotate(10 1290 420)">E=mc²</text>
+    <text x="70" y="290" font-size="32" fill="var(--c-lang)" transform="rotate(-12 70 290)">Аә</text>
+    <text x="1040" y="870" font-size="34" fill="var(--c-math)" transform="rotate(-8 1040 870)">x²+y²</text>
+    <text x="560" y="880" font-size="40" fill="var(--c-club)">÷</text>
+    <text x="780" y="60" font-size="34" fill="var(--c-code)" transform="rotate(12 780 60)">ABC</text>
+    <!-- Kazakh ornament (қошқар мүйіз) -->
+    <g stroke="var(--c-club)" transform="translate(1390 40) rotate(200) scale(1.3)"><use href="#horn"/></g>
+    <g stroke="var(--c-summer)" transform="translate(40 30) rotate(160) scale(1.1)"><use href="#horn"/></g>
+    <g stroke="var(--c-club)" transform="translate(720 880) scale(.9)"><use href="#horn"/></g>
+    <g stroke="var(--c-olymp)" transform="translate(300 770) rotate(-15) scale(.8)"><use href="#horn"/></g>
+    <!-- sparkles & dots -->
+    <g stroke="none">
+      <use href="#spark" fill="var(--c-club)" transform="translate(470 230)"/>
+      <use href="#spark" fill="var(--c-lang)" transform="translate(1200 260) scale(.8)"/>
+      <use href="#spark" fill="var(--c-summer)" transform="translate(880 820) scale(1.2)"/>
+      <use href="#spark" fill="var(--c-code)" transform="translate(180 540) scale(.7)"/>
+      <use href="#spark" fill="var(--c-olymp)" transform="translate(1390 760) scale(.9)"/>
+      <circle cx="320" cy="200" r="6" fill="var(--c-sci)"/><circle cx="1110" cy="190" r="5" fill="var(--c-math)"/>
+      <circle cx="960" cy="760" r="7" fill="var(--c-lang)"/><circle cx="420" cy="660" r="5" fill="var(--c-summer)"/>
+    </g>
+    <path d="M520 800 q20 -18 40 0 t40 0 t40 0" stroke="var(--c-summer)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M900 140 q20 -18 40 0 t40 0" stroke="var(--c-lang)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>
+</div>
 <div class="wrap">
   <div class="bar">
     <div class="logo" aria-label="DaDa.Edu">
@@ -183,6 +265,8 @@ footer{font-size:13px;color:var(--muted);max-width:80ch}
       <i style="width:120px;height:120px;right:-30px;top:-40px;background:var(--c-club)"></i>
       <i style="width:46px;height:46px;right:36%;bottom:-18px;background:var(--c-lang)"></i>
       <i style="width:18px;height:18px;left:46%;top:22px;background:var(--c-code)"></i>
+      <svg class="art" width="150" height="110" viewBox="-75 -55 150 110" style="left:30%;bottom:6px"><g stroke="var(--c-summer)"><path d="M-70 50 L-30 -10 L-8 20 L20 -30 L70 50 Z M20 -30 L8 -8 L20 -14 L32 -8 Z"/></g></svg>
+      <svg class="art a2" width="120" height="120" viewBox="-60 -60 120 120" style="left:54%;top:14px"><g stroke="var(--c-club)"><circle r="18"/><path d="M0 -30 V-46 M0 30 V46 M-30 0 H-46 M30 0 H46 M-21 -21 L-32 -32 M21 21 L32 32 M-21 21 L-32 32 M21 -21 L32 -32"/></g></svg>
     </div>
     <div>
       <h1><span class="d1">Da</span><span class="d2">Da</span><span class="dot">.</span><span class="e">Edu</span></h1>
@@ -826,7 +910,7 @@ function renderDetail(){
   if (state.q){
     const q = state.q.toLowerCase();
     const res = [...localItems(pl).filter(i=>!i.net), ...ITEMS].filter(i=>{ const l = L(i); return fitsGrade(i) && [l.t,l.o,l.d,l.x,i.t].join(" ").toLowerCase().includes(q); });
-    el.setAttribute("style","--cc:var(--violet);--ct:#fff");
+    el.setAttribute("style","--cc:var(--violet);--ct:var(--on-violet)");
     el.innerHTML = `<div class="dhead"><h2>${tr("Поиск","Іздеу")}: «${esc(state.q)}»</h2><p>${tr(`${res.length} ${plural(res.length,["результат","результата","результатов"])} во всех категориях`,`Барлық санаттарда ${res.length} нәтиже`)}${state.grade?tr(` для ${state.grade} класса`,` (${state.grade}-сынып)`):""}.</p></div>
       <div class="dbody">${res.length?`<div class="items">${res.map(i=>card(i)).join("")}</div>`:`<div class="empty">${tr("Ничего не нашлось. Попробуй другое слово или выбери «Все» классы.","Ештеңе табылмады. Басқа сөзбен іздеп көр немесе «Барлығы» сыныптарын таңда.")}</div>`}</div>`;
     return;
