@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="DaDa.Edu: Қазақстанның әр қаласындағы 5–11 сыныптарға арналған олимпиадалар, үйірмелер, тілдер және жазғы мектептер.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>DaDa.Edu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: playful hero with grade picker → grid of bright category tiles → the chosen category unfolds below as a full catalogue with filters. */
+:root{
+  --bg:#F6F4FF;
+  --surface:#FFFFFF;
+  --ink:#1C1838;
+  --muted:#635E80;
+  --line:#E2DEF3;
+  --soft:#EEEBFB;
+  --violet:#6B4EFF;
+  --c-olymp:#6B4EFF;  --t-olymp:#FFFFFF;
+  --c-math:#1E7BEF;   --t-math:#FFFFFF;
+  --c-lang:#F0457E;   --t-lang:#FFFFFF;
+  --c-code:#7CC414;   --t-code:#1A2A00;
+  --c-sci:#FF8A1F;    --t-sci:#2B1500;
+  --c-club:#FFC83D;   --t-club:#2B2000;
+  --c-summer:#22C3E6; --t-summer:#032B33;
+  --c-exam:#0F766E;   --t-exam:#FFFFFF;
+  --c-city:#1C1838;   --t-city:#FFFFFF;
+  --ok:#0E9F6E; --soon:#E08600;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#121029;--surface:#1B1838;--ink:#F1EEFF;--muted:#A9A3CC;--line:#2E2A55;--soft:#24204A;
+    --violet:#9C88FF;--c-olymp:#7C62FF;--c-exam:#14958A;--c-city:#F1EEFF;--t-city:#1C1838;--ok:#34D399;--soon:#FFB347;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121029;--surface:#1B1838;--ink:#F1EEFF;--muted:#A9A3CC;--line:#2E2A55;--soft:#24204A;
+  --violet:#9C88FF;--c-olymp:#7C62FF;--c-exam:#14958A;--c-city:#F1EEFF;--t-city:#1C1838;--ok:#34D399;--soon:#FFB347;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;padding-inline:clamp(16px,4vw,44px);padding-block:20px 60px}
+.wrap{max-width:1200px;margin-inline:auto;display:flex;flex-direction:column;gap:34px}
+h1,h2,h3{margin:0;text-wrap:balance}
+a{color:var(--violet);font-weight:700}
+:focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+button{font:inherit;color:inherit}
+
+/* top bar */
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.logo .dots{display:inline-grid;grid-template-columns:repeat(2,9px);gap:3px}
+.logo .dots i{width:9px;height:9px;border-radius:50%;display:block}
+.logo b{color:var(--violet)}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 14px;min-width:0;flex:0 1 320px}
+.search input{border:0;background:transparent;font:inherit;color:var(--ink);outline:none;width:100%;min-width:0}
+.search:focus-within{border-color:var(--violet)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:var(--surface);border-radius:28px;padding:clamp(24px,5vw,52px);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;align-items:center}
+@media (max-width:820px){.hero{grid-template-columns:1fr}}
+.hero h1{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,6.4vw,74px);line-height:.98;letter-spacing:-.035em}
+.hero h1 .d1{color:var(--c-olymp)}.hero h1 .d2{color:var(--c-lang)}.hero h1 .dot{color:var(--c-club)}.hero h1 .e{color:var(--c-code)}
+.hero p{margin:14px 0 0;font-size:18px;color:var(--muted);max-width:44ch}
+.shapes{position:absolute;inset:0;pointer-events:none;z-index:0}
+.shapes i{position:absolute;display:block;border-radius:50%;opacity:.9}
+.hero > *:not(.shapes){position:relative;z-index:1}
+.grade-card{background:var(--soft);border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.grade-card .lbl{font-weight:800;font-size:15px}
+.grades{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.gbtn{cursor:pointer;border:2px solid transparent;background:var(--surface);border-radius:14px;padding:10px 0;font-family:var(--f-display);font-weight:800;font-size:20px;transition:transform .12s}
+.gbtn small{display:block;font-family:var(--f-body);font-size:11px;font-weight:700;color:var(--muted)}
+.gbtn:hover{transform:translateY(-2px)}
+.gbtn[aria-pressed="true"]{background:var(--violet);color:#fff;border-color:var(--violet)}
+.gbtn[aria-pressed="true"] small{color:#fff}
+.grade-card .hint{font-size:13px;color:var(--muted);margin:0}
+
+/* categories */
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec-h h2{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,3vw,30px);letter-spacing:-.02em}
+.sec-h span{color:var(--muted);font-size:14px}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{cursor:pointer;text-align:left;border:0;border-radius:22px;padding:18px 18px 16px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;gap:10px;background:var(--cc);color:var(--ct);position:relative;overflow:hidden;transition:transform .15s, box-shadow .15s}
+.cat:hover{transform:translateY(-3px) rotate(-.4deg);box-shadow:0 10px 24px -12px var(--cc)}
+.cat .glyph{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:1;opacity:.95}
+.cat .name{font-family:var(--f-display);font-weight:800;font-size:16px;line-height:1.2}
+.cat .count{font-size:13px;font-weight:700;opacity:.85}
+.cat::after{content:"";position:absolute;right:-26px;top:-26px;width:90px;height:90px;border-radius:50%;background:currentColor;opacity:.1}
+.cat[aria-pressed="true"]{outline:4px solid var(--ink);outline-offset:3px}
+
+/* detail */
+.detail{background:var(--surface);border-radius:28px;overflow:hidden;scroll-margin-top:16px}
+.dhead{background:var(--cc);color:var(--ct);padding:clamp(20px,4vw,36px);display:flex;flex-direction:column;gap:10px}
+.dhead h2{font-family:var(--f-display);font-weight:800;font-size:clamp(26px,4vw,42px);letter-spacing:-.03em}
+.dhead p{margin:0;max-width:64ch;font-size:16.5px;opacity:.95}
+.dfilters{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{cursor:pointer;border:2px solid currentColor;background:transparent;border-radius:999px;padding:4px 13px;font-size:14px;font-weight:700;color:var(--ct)}
+.chip[aria-pressed="true"]{background:var(--ct);color:var(--cc)}
+.dbody{padding:clamp(16px,3vw,32px);display:flex;flex-direction:column;gap:16px}
+.summary{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:14px;color:var(--muted);font-weight:700}
+.summary b{color:var(--ink);font-variant-numeric:tabular-nums}
+.items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.items{grid-template-columns:1fr}}
+.item{border:2px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px;background:var(--surface)}
+.item-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.item h3{font-size:18px;font-weight:800;line-height:1.25}
+.item .org{font-size:13.5px;color:var(--muted);font-weight:600}
+.status{font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px;white-space:nowrap;background:var(--soft);color:var(--muted)}
+.status.now{background:var(--ok);color:#fff}
+.status.soon{background:var(--soon);color:#241300}
+.gstrip{display:flex;flex-direction:column;gap:4px}
+.gstrip .row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.gstrip .row i{height:22px;border-radius:6px;background:var(--soft);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.gstrip .row i.in{background:var(--cc);color:var(--ct)}
+.gstrip .row i.me{box-shadow:inset 0 0 0 2px var(--ink)}
+.gstrip .cap{font-size:12.5px;font-weight:700;color:var(--muted)}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.fact{font-size:12.5px;font-weight:700;background:var(--soft);border-radius:8px;padding:3px 9px}
+.item p{margin:0;font-size:15px}
+.item .how{font-size:14.5px;color:var(--muted)}
+.item .how b{color:var(--ink)}
+.item .src{font-size:14px;margin-top:auto}
+.empty{padding:30px 0;text-align:center;color:var(--muted);font-weight:700}
+/* location */
+.loc{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:420px){.loc{grid-template-columns:1fr}}
+.loc select{font:inherit;font-weight:700;font-size:14.5px;color:var(--ink);background:var(--surface);border:2px solid transparent;border-radius:12px;padding:9px 10px;width:100%;min-width:0}
+.loc select:focus{border-color:var(--violet)}
+.cat.city{grid-column:span 2;min-height:150px}
+.cat.city .name{font-size:clamp(18px,2.4vw,24px)}
+.cat.city .pins{display:flex;gap:5px}
+.cat.city .pins i{width:10px;height:10px;border-radius:50%;display:block}
+@media (max-width:900px){.cat.city{grid-column:1/-1}}
+.where{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:800;border-radius:10px;padding:6px 10px;background:var(--soft);color:var(--muted)}
+.where svg{flex:none}
+.where.here{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.where.near{background:color-mix(in srgb,var(--soon) 18%,transparent);color:var(--ink)}
+.status.sure{background:var(--ok);color:#fff}
+.status.usual{background:var(--soon);color:#241300}
+.status.far{background:var(--soft);color:var(--muted)}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:14px;cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--violet)}
+.hidden-note{font-size:14px;color:var(--muted);font-weight:700}
+.hidden-note button{cursor:pointer;background:none;border:0;color:var(--violet);font-weight:800;text-decoration:underline;padding:0}
+footer{font-size:13px;color:var(--muted);max-width:80ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<style>
+.right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex:0 1 auto;min-width:0}
+.langs{display:inline-flex;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:3px}
+.langs button{cursor:pointer;border:0;background:transparent;border-radius:999px;padding:5px 12px;font-weight:800;font-size:14px}
+.langs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+</style>
+<div class="wrap">
+  <div class="bar">
+    <div class="logo" aria-label="DaDa.Edu">
+      <span class="dots" aria-hidden="true"><i style="background:var(--c-olymp)"></i><i style="background:var(--c-lang)"></i><i style="background:var(--c-club)"></i><i style="background:var(--c-code)"></i></span>
+      DaDa<b>.Edu</b>
+    </div>
+    <div class="right">
+      <div class="langs" role="group" aria-label="Тіл / Язык">
+        <button type="button" id="lang-kk" data-l="kk">Қаз</button>
+        <button type="button" id="lang-ru" data-l="ru">Рус</button>
+      </div>
+      <label class="search" for="q">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <input id="q" type="search" autocomplete="off">
+      </label>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="shapes" aria-hidden="true">
+      <i style="width:120px;height:120px;right:-30px;top:-40px;background:var(--c-club)"></i>
+      <i style="width:46px;height:46px;right:36%;bottom:-18px;background:var(--c-lang)"></i>
+      <i style="width:18px;height:18px;left:46%;top:22px;background:var(--c-code)"></i>
+    </div>
+    <div>
+      <h1><span class="d1">Da</span><span class="d2">Da</span><span class="dot">.</span><span class="e">Edu</span></h1>
+      <p id="tagline"></p>
+    </div>
+    <div class="grade-card">
+      <div class="lbl" id="lblLive"></div>
+      <div class="loc">
+        <select id="regionSel"></select>
+        <select id="placeSel"></select>
+      </div>
+      <div class="lbl" id="lblGrade"></div>
+      <div class="grades" id="grades" role="group"></div>
+      <p class="hint" id="gradeHint"></p>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <div class="sec-h"><h2 id="catsTitle"></h2><span id="catHint"></span></div>
+    <div class="cats" id="cats"></div>
+  </section>
+
+  <section class="detail" id="detail" aria-live="polite"></section>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+const UI = {
+  tagline:{ru:"Олимпиады, кружки, языки и летние школы для 5–11 классов в твоём городе. Выбери, где живёшь, свой класс и нажми на категорию.",kk:"Қалаңдағы 5–11 сыныптарға арналған олимпиадалар, үйірмелер, тілдер және жазғы мектептер. Қай жерде тұратыныңды, сыныбыңды таңда да, санатты бас."},
+  live:{ru:"Я живу",kk:"Мен тұратын жер"},
+  grade:{ru:"Я учусь в классе",kk:"Менің сыныбым"},
+  all:{ru:"Все",kk:"Барлығы"}, cls:{ru:"класс",kk:"сынып"}, clsPl:{ru:"классы",kk:"сынып"},
+  cats:{ru:"Категории",kk:"Санаттар"},
+  catHint:{ru:"Нажми на категорию, чтобы открыть всё внутри",kk:"Ішіндегінің бәрін ашу үшін санатты бас"},
+  search:{ru:"Найти: физика, IELTS, Python…",kk:"Іздеу: физика, IELTS, Python…"},
+  center:{ru:"(центр)",kk:"(орталық)"},
+  village:{ru:"Село или посёлок",kk:"Ауыл немесе кент"},
+  howStart:{ru:"Как начать:",kk:"Қалай бастау керек:"},
+  onlyMine:{ru:"Только то, что доступно мне (рядом, онлайн или через школу)",kk:"Тек маған қолжетімдісі (жақын жерде, онлайн немесе мектеп арқылы)"},
+  show:{ru:"Показать",kk:"Көрсету"},
+  allDirs:{ru:"Всё",kk:"Барлығы"},
+  footer:{ru:"«Точно есть» значит, что учреждение работает в этом городе: НИШ, вузы, региональные центры, языковые институты, сети вроде American Corners и KIBERone. «Обычно есть» значит, что такие кружки работают почти в каждом городе или районе, но адрес и расписание нужно уточнить в отделе образования или акимате. Расстояния указаны по прямой. Даты указаны ориентировочно на 2026–2027 учебный год. Перед регистрацией проверь официальный сайт.",
+          kk:"«Нақты бар» дегеніміз мекеме осы қалада жұмыс істейді: НЗМ, ЖОО, өңірлік орталықтар, тіл институттары, American Corners және KIBERone сияқты желілер. «Әдетте бар» дегеніміз мұндай үйірмелер әр қалада не ауданда дерлік бар, бірақ мекенжайы мен кестесін білім бөлімінен немесе әкімдіктен нақтылау керек. Қашықтық түзу сызықпен көрсетілген. Күндер 2026–2027 оқу жылына шамамен берілген. Тіркелер алдында ресми сайтты тексер."},
+};
+
+const CATS = [
+  {id:"city"},
+  {id:"olymp",glyph:"№1",ru:["Олимпиады","Предметные олимпиады от школьного этапа до международных. Ближайшие стоят первыми."],kk:["Олимпиадалар","Мектеп кезеңінен халықаралық деңгейге дейінгі пән олимпиадалары. Ең жақындары бірінші тұр."]},
+  {id:"math",glyph:"π+",ru:["Математические кружки","Где решать задачи сверх школьной программы: кружки, курсы и бесплатные онлайн-сборники."],kk:["Математика үйірмелері","Мектеп бағдарламасынан тыс есеп шығаратын жерлер: үйірмелер, курстар және тегін онлайн жинақтар."]},
+  {id:"lang",glyph:"Aa",ru:["Языковые кружки","Английский, казахский, китайский, немецкий, французский, корейский, турецкий. Разговорные клубы, курсы и приложения."],kk:["Тіл үйірмелері","Ағылшын, қазақ, қытай, неміс, француз, корей, түрік тілдері. Сөйлесу клубтары, курстар және қосымшалар."]},
+  {id:"code",glyph:"</>",ru:["Программирование и роботы","От Scratch до олимпиадного программирования, IT-школ и соревнований роботов."],kk:["Бағдарламалау және роботтар","Scratch-тан олимпиадалық бағдарламалауға, IT-мектептер мен робот жарыстарына дейін."]},
+  {id:"sci",glyph:"H₂O",ru:["Наука и проекты","Исследовательские проекты, научные конкурсы и кружки по естественным наукам."],kk:["Ғылым және жобалар","Зерттеу жобалары, ғылыми байқаулар және жаратылыстану үйірмелері."]},
+  {id:"club",glyph:"!?",ru:["Дебаты, шахматы, творчество","Внеклассные занятия, которые развивают речь, лидерство и характер. Здесь же бесплатные кружки за счёт государства."],kk:["Дебат, шахмат, шығармашылық","Сөйлеу қабілетін, көшбасшылық пен мінезді дамытатын сабақтан тыс істер. Мұнда мемлекет есебінен тегін үйірмелер де бар."]},
+  {id:"summer",glyph:"☀",ru:["Летние школы","Летние программы и лагеря в Казахстане и за рубежом, в том числе бесплатные."],kk:["Жазғы мектептер","Қазақстандағы және шетелдегі жазғы бағдарламалар мен лагерьлер, соның ішінде тегіндері."]},
+  {id:"exam",glyph:"A+",ru:["Поступление и экзамены","Экзамены в НИШ, БИЛ и РФМШ, ЕНТ, IELTS и SAT. Когда сдавать и в каком классе."],kk:["Түсу және емтихандар","НЗМ, БИЛ және РФМШ емтихандары, ҰБТ, IELTS және SAT. Қашан және қай сыныпта тапсыру керек."]},
+];
+
+const ALL = [1,2,3,4,5,6,7,8,9,10,11,12], SCHOOL = [9,10,11,12,1,2,3,4,5];
+const AMC = ["aktobe","almaty","astana","karaganda","kostanay","oral","oskemen","pavlodar","petropavl","shymkent"];
+// g: классы; m: месяцы; w: где доступно (o онлайн, s через школу, c обычно в каждом городе, r областные центры, a за рубежом, nis, {cities,on})
+// k: [название, организатор, описание, как начать] на казахском
+const ITEMS = [
+  {c:"olymp",d:"Все предметы",t:"Республиканская олимпиада по общеобразовательным предметам",o:"Центр «Дарын» и управления образования",g:[9,11],m:[10,11,12,1,3,4],f:"Очно",p:"Бесплатно",w:"s",
+   x:"Главная олимпиада страны: математика, физика, химия, биология, информатика, география, языки и другие предметы. Этапы: школьный (октябрь) → районный (ноябрь–декабрь) → областной (январь) → республиканский (март–апрель).",h:"Скажи учителю по предмету, что хочешь участвовать в школьном этапе.",u:"daryn.kz",
+   k:["Жалпы білім беретін пәндер бойынша республикалық олимпиада","«Дарын» орталығы және білім басқармалары","Елдің басты олимпиадасы: математика, физика, химия, биология, информатика, география, тілдер және басқа пәндер. Кезеңдері: мектеп (қазан) → аудан (қараша–желтоқсан) → облыс (қаңтар) → республика (наурыз–сәуір).","Пән мұғаліміне мектеп кезеңіне қатысқың келетінін айт."]},
+  {c:"olymp",d:"Информатика",t:"«Бобёр» (Bebras)",o:"Международный конкурс по информатике",g:[5,11],m:[11],f:"Онлайн в школе",p:"Бесплатно",w:"s",
+   x:"Задачи на логику и алгоритмическое мышление без программирования. Отличный первый шаг для 5–7 классов.",h:"Спроси учителя информатики, зарегистрирована ли школа.",u:"bebras.org",
+   k:["«Бебрас» (Bebras)","Информатикадан халықаралық сайыс","Бағдарламалаусыз логика мен алгоритмдік ойлау есептері. 5–7 сыныптар үшін тамаша алғашқы қадам.","Информатика мұғалімінен мектеп тіркелген-тіркелмегенін сұра."]},
+  {c:"olymp",d:"Математика",t:"Международная олимпиада «Кенгуру»",o:"Kangourou sans Frontières",g:[5,11],m:[3],f:"В школе",p:"Небольшой взнос",w:"s",
+   x:"Тест с задачами на смекалку для всех классов. Хорошая тренировка перед серьёзными олимпиадами.",h:"Узнай у учителя математики, участвует ли школа в этом году.",u:"aksf.org",
+   k:["«Кенгуру» халықаралық олимпиадасы","Kangourou sans Frontières","Барлық сыныптарға арналған тапқырлық есептері бар тест. Күрделі олимпиадаларға жақсы жаттығу.","Математика мұғалімінен биыл мектеп қатысатынын біл."]},
+  {c:"olymp",d:"Все предметы",t:"Интеллектуальные олимпиады «Ақбота»",o:"«Ақбота»",g:[5,11],m:[11,12,2,3,4],f:"Онлайн / в школе",p:"Платно",w:"o",
+   x:"Олимпиады по многим предметам на казахском и русском языках, несколько туров за год.",h:"Регистрация через школу или на сайте организатора.",u:"akbota.kz",
+   k:["«Ақбота» зияткерлік олимпиадалары","«Ақбота»","Қазақ және орыс тілдерінде көптеген пәндер бойынша олимпиадалар, жылына бірнеше тур.","Мектеп арқылы немесе ұйымдастырушының сайтында тіркел."]},
+  {c:"olymp",d:"Математика · Физика · Информатика",t:"Международная Жаутыковская олимпиада",o:"РФМШ, Алматы",g:[9,11],m:[1],f:"Очно, Алматы",p:"Через школу",w:"s",
+   x:"Командная международная олимпиада, в которой участвуют команды из десятков стран. Медаль здесь очень ценится при поступлении.",h:"Школа регистрирует команду осенью. Если твоя школа не участвует, спроси местный НИШ или физмат-школу.",u:"izho.kz",
+   k:["Халықаралық Жәутіков олимпиадасы","РФМШ, Алматы","Ондаған елдің командалары қатысатын халықаралық командалық олимпиада. Мұндағы медаль университетке түскенде жоғары бағаланады.","Мектеп команданы күзде тіркейді. Мектебің қатыспаса, жергілікті НЗМ немесе физика-математика мектебінен сұра."]},
+  {c:"olymp",d:"Математика",t:"Азиатско-Тихоокеанская математическая олимпиада (APMO)",o:"Национальный отбор",g:[9,11],m:[3],f:"Письменно, в Казахстане",p:"Бесплатно",w:"s",
+   x:"Сильная международная олимпиада, которую пишут у себя в стране. Пропуск на неё дают лучшие места на национальных олимпиадах.",h:"Займи высокое место на областном или республиканском этапе по математике.",u:"apmo-official.org",
+   k:["Азия-Тынық мұхиты математикалық олимпиадасы (APMO)","Ұлттық іріктеу","Өз еліңде жазылатын күшті халықаралық олимпиада. Оған ұлттық олимпиадалардағы жоғары орындар жол ашады.","Математикадан облыстық немесе республикалық кезеңде жоғары орын ал."]},
+  {c:"olymp",d:"Физика · Химия · Биология",t:"Международная естественнонаучная олимпиада юниоров (IJSO)",o:"Национальный отбор",g:[8,9],m:[12],f:"Очно, за рубежом",p:"Для сборной",w:"s",
+   x:"Олимпиада для школьников до 15 лет по трём наукам сразу. Ранний международный результат.",h:"Спроси региональный «Дарын», как в этом году отбирают юниорскую сборную.",u:"ijsoweb.org",
+   k:["Жасөспірімдер арасындағы халықаралық жаратылыстану олимпиадасы (IJSO)","Ұлттық іріктеу","15 жасқа дейінгі оқушыларға арналған, бірден үш ғылым бойынша олимпиада. Ерте халықаралық нәтиже.","Биыл жасөспірімдер құрамасы қалай іріктелетінін өңірлік «Дарыннан» сұра."]},
+  {c:"olymp",d:"Информатика",t:"USACO",o:"США, онлайн",g:[5,11],m:[12,1,2,3],f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Четыре онлайн-тура с декабря по март. Можно начать с уровня Bronze в любом классе и подняться до Platinum.",h:"Зарегистрируйся на сайте и реши тур в удобные выходные.",u:"usaco.org",
+   k:["USACO","АҚШ, онлайн","Желтоқсаннан наурызға дейін төрт онлайн тур. Кез келген сыныпта Bronze деңгейінен бастап, Platinum-ға дейін көтерілуге болады.","Сайтта тіркеліп, турды ыңғайлы демалыс күні шеш."]},
+  {c:"olymp",d:"Физика",t:"Physics Cup",o:"Яан Калда, онлайн",g:[9,11],m:[12,1,2,3],f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Очень сложные задачи по физике, которые публикуют по одной. Можно отправлять решение несколько раз.",h:"Следи за сайтом с декабря и присылай решения на английском.",u:"physicscup.ee",
+   k:["Physics Cup","Яан Калда, онлайн","Бір-бірден жарияланатын өте қиын физика есептері. Шешімді бірнеше рет жіберуге болады.","Желтоқсаннан бастап сайтты бақылап, шешімдерді ағылшынша жібер."]},
+  {c:"olymp",d:"Математика",t:"Европейская математическая олимпиада для девушек (EGMO)",o:"Национальный отбор",g:[9,11],m:[4],f:"Очно, за рубежом",p:"Для сборной",w:"s",
+   x:"Казахстан регулярно отправляет команду. Большое преимущество для девушек, которые любят математику.",h:"Покажи сильный результат на республиканской олимпиаде и сборах.",u:"egmo.org",
+   k:["Қыздарға арналған Еуропалық математикалық олимпиада (EGMO)","Ұлттық іріктеу","Қазақстан тұрақты түрде команда жібереді. Математиканы жақсы көретін қыздар үшін үлкен мүмкіндік.","Республикалық олимпиада мен жиындарда күшті нәтиже көрсет."]},
+  {c:"olymp",d:"Математика",t:"Международная математическая олимпиада (IMO)",o:"Сборная Казахстана",g:[9,11],m:[7],f:"Очно, за рубежом",p:"Для сборной",w:"s",
+   x:"Самая престижная олимпиада по математике в мире.",h:"Путь: республиканская олимпиада → учебно-тренировочные сборы → сборная.",u:"imo-official.org",
+   k:["Халықаралық математикалық олимпиада (IMO)","Қазақстан құрамасы","Әлемдегі математикадан ең беделді олимпиада.","Жолы: республикалық олимпиада → оқу-жаттығу жиындары → құрама."]},
+  {c:"olymp",d:"Физика",t:"Международная физическая олимпиада (IPhO)",o:"Сборная Казахстана",g:[10,11],m:[7],f:"Очно, за рубежом",p:"Для сборной",w:"s",
+   x:"Теория и экспериментальный тур. Главная олимпиада по физике.",h:"Через республиканскую олимпиаду и отборочные сборы.",u:"ipho-new.org",
+   k:["Халықаралық физикалық олимпиада (IPhO)","Қазақстан құрамасы","Теория және эксперимент турлары. Физикадан басты олимпиада.","Республикалық олимпиада және іріктеу жиындары арқылы."]},
+  {c:"olymp",d:"Химия",t:"Международная химическая олимпиада (IChO)",o:"Сборная Казахстана",g:[10,11],m:[7],f:"Очно, за рубежом",p:"Для сборной",w:"s",
+   x:"Главная олимпиада по химии. Подготовительные задачи публикуют в январе.",h:"Через республиканскую олимпиаду по химии.",u:"ichosc.org",
+   k:["Халықаралық химиялық олимпиада (IChO)","Қазақстан құрамасы","Химиядан басты олимпиада. Дайындық есептері қаңтарда жарияланады.","Химиядан республикалық олимпиада арқылы."]},
+  {c:"olymp",d:"Биология",t:"Международная биологическая олимпиада (IBO)",o:"Сборная Казахстана",g:[10,11],m:[7],f:"Очно, за рубежом",p:"Для сборной",w:"s",
+   x:"Сильнейший результат для будущих медиков и биологов.",h:"Через республиканскую олимпиаду по биологии.",u:"ibo-info.org",
+   k:["Халықаралық биологиялық олимпиада (IBO)","Қазақстан құрамасы","Болашақ дәрігерлер мен биологтар үшін ең күшті нәтиже.","Биологиядан республикалық олимпиада арқылы."]},
+  {c:"olymp",d:"Информатика",t:"Международная олимпиада по информатике (IOI)",o:"Сборная Казахстана",g:[9,11],m:[8],f:"Очно, за рубежом",p:"Для сборной",w:"s",
+   x:"Олимпиадное программирование высшего уровня.",h:"Через республиканскую олимпиаду по информатике. Тренируйся на Codeforces.",u:"ioinformatics.org",
+   k:["Халықаралық информатика олимпиадасы (IOI)","Қазақстан құрамасы","Ең жоғары деңгейдегі олимпиадалық бағдарламалау.","Информатикадан республикалық олимпиада арқылы. Codeforces-та жаттық."]},
+  {c:"olymp",d:"География",t:"Международная географическая олимпиада (IGeO)",o:"Сборная Казахстана",g:[9,11],m:[8],f:"Очно, за рубежом",p:"Для сборной",w:"s",
+   x:"Конкуренция ниже, чем в математике, а результат ценится не меньше.",h:"Через республиканскую олимпиаду по географии.",u:"geoolympiad.org",
+   k:["Халықаралық география олимпиадасы (IGeO)","Қазақстан құрамасы","Бәсеке математикадағыдан төмен, ал нәтиже одан кем бағаланбайды.","Географиядан республикалық олимпиада арқылы."]},
+
+  {c:"math",d:"Кружок",t:"Школьный олимпиадный кружок",o:"Твоя школа",g:[5,11],m:SCHOOL,f:"Очно",p:"Бесплатно",w:"s",
+   x:"Самый простой старт: раз в неделю решать задачи с учителем и готовиться к школьному этапу олимпиады.",h:"Попроси учителя математики открыть кружок, если его нет. Хватит 5–6 желающих.",u:"",
+   k:["Мектептегі олимпиадалық үйірме","Сенің мектебің","Ең оңай бастама: аптасына бір рет мұғаліммен есеп шығарып, олимпиаданың мектеп кезеңіне дайындал.","Үйірме болмаса, математика мұғалімінен ашуды сұра. 5–6 ниеттес жеткілікті."]},
+  {c:"math",d:"Курсы",t:"Олимпиадные курсы при РФМШ",o:"Республиканская физико-математическая школа",g:[7,11],m:SCHOOL,f:"Очно / онлайн",p:"Уточняй",w:{cities:["almaty","astana"],on:true},
+   x:"Подготовка к олимпиадам с преподавателями, которые тренируют сборную.",h:"Смотри наборы на сайте школы в начале учебного года.",u:"fizmat.kz",
+   k:["РФМШ жанындағы олимпиадалық курстар","Республикалық физика-математика мектебі","Құраманы дайындайтын ұстаздармен олимпиадаға дайындық.","Оқу жылының басында мектеп сайтындағы қабылдауды қара."]},
+  {c:"math",d:"Кружок",t:"Кружки во Дворце школьников",o:"Городской дворец школьников",g:[5,11],m:SCHOOL,f:"Очно",p:"Часто бесплатно",w:"c",
+   x:"Во многих городах во Дворце школьников есть кружки по математике, логике и шахматам.",h:"Позвони или приди в сентябре, когда идёт запись.",u:"",
+   k:["Оқушылар сарайындағы үйірмелер","Қалалық оқушылар сарайы","Көптеген қалада Оқушылар сарайында математика, логика және шахмат үйірмелері бар.","Қыркүйекте, жазылу кезінде, қоңырау шал немесе бар."]},
+  {c:"math",d:"Онлайн",t:"Khan Academy",o:"Некоммерческая платформа",g:[5,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Видеоуроки и упражнения от арифметики до математического анализа. Можно закрыть пробелы в школьной программе.",h:"Создай аккаунт и пройди тест по своему классу.",u:"khanacademy.org",
+   k:["Khan Academy","Коммерциялық емес платформа","Арифметикадан математикалық анализге дейін бейнесабақтар мен жаттығулар. Мектеп бағдарламасындағы олқылықтарды жабуға болады.","Аккаунт ашып, өз сыныбың бойынша тест тапсыр."]},
+  {c:"math",d:"Онлайн",t:"Задачи.ру",o:"МЦНМО",g:[5,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Огромная база олимпиадных задач с решениями, рассортированных по темам и сложности.",h:"Выбери тему (например, «Чётность») и решай по 3 задачи в день.",u:"problems.ru",
+   k:["Задачи.ру (problems.ru)","МЦНМО","Тақырыбы мен қиындығы бойынша сұрыпталған, шешімдері бар олимпиадалық есептердің үлкен базасы (орыс тілінде).","Тақырып таңда (мысалы, «Жұптық») және күніне 3 есеп шығар."]},
+  {c:"math",d:"Онлайн",t:"Art of Problem Solving",o:"AoPS, на английском",g:[7,11],m:ALL,f:"Онлайн",p:"Форум бесплатно, курсы платно",w:"o",
+   x:"Главное мировое сообщество олимпиадников: форум, архив задач всех олимпиад и сильные курсы.",h:"Начни с раздела Alcumus: это бесплатный тренажёр задач.",u:"artofproblemsolving.com",
+   k:["Art of Problem Solving","AoPS, ағылшын тілінде","Олимпиадашылардың басты әлемдік қауымдастығы: форум, барлық олимпиадалардың есептер мұрағаты және күшті курстар.","Тегін есеп тренажёры Alcumus бөлімінен баста."]},
+  {c:"math",d:"Онлайн",t:"Bilimland",o:"Казахстанская образовательная платформа",g:[5,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Уроки на казахском и русском по школьной программе Казахстана.",h:"Зайди на сайт и выбери свой класс.",u:"bilimland.kz",
+   k:["Bilimland","Қазақстандық білім беру платформасы","Қазақстан мектеп бағдарламасы бойынша қазақ және орыс тілдеріндегі сабақтар.","Сайтқа кіріп, сыныбыңды таңда."]},
+
+  {c:"lang",d:"Английский",t:"American Corner (Американский уголок)",o:"Областные библиотеки, сеть AmCorners",g:[7,11],m:SCHOOL,f:"Очно",p:"Бесплатно",w:{cities:AMC},
+   x:"Бесплатные разговорные клубы английского, STEAM-занятия, кино и встречи с носителями языка. Работают в 10 городах.",h:"Найди American Corner своего города в соцсетях и приходи на ближайший клуб.",u:"amcorners.kz",
+   k:["American Corner (Америка бұрышы)","Облыстық кітапханалар, AmCorners желісі","Ағылшын тілінде тегін сөйлесу клубтары, STEAM сабақтары, кино және тіл иелерімен кездесулер. 10 қалада жұмыс істейді.","Қалаңдағы American Corner-ді әлеуметтік желіден тауып, ең жақын клубқа кел."]},
+  {c:"lang",d:"Английский",t:"Подготовка к IELTS",o:"British Council и учебные центры",g:[9,11],m:ALL,f:"Онлайн / очно",p:"Есть бесплатные материалы",w:"o",
+   x:"Бесплатные пробные тесты и уроки на сайте British Council, платные курсы в центрах.",h:"Начни с бесплатного пробного теста, чтобы понять свой уровень.",u:"takeielts.britishcouncil.org",
+   k:["IELTS-ке дайындық","British Council және оқу орталықтары","British Council сайтында тегін сынақ тестері мен сабақтар, орталықтарда ақылы курстар.","Деңгейіңді білу үшін тегін сынақ тестінен баста."]},
+  {c:"lang",d:"Английский",t:"Английский книжный клуб",o:"Создай в своей школе",g:[5,11],m:SCHOOL,f:"Очно",p:"Бесплатно",w:"s",
+   x:"Читаете одну книгу на английском в месяц и обсуждаете её. Для младших подойдут адаптированные книги.",h:"Собери 4–5 друзей и попроси учителя английского помочь выбрать книги.",u:"",
+   k:["Ағылшын кітап клубы","Мектебіңде өзің құр","Айына бір кітапты ағылшынша оқып, талқылайсыңдар. Кішілерге бейімделген кітаптар жарайды.","4–5 досыңды жинап, ағылшын мұғалімінен кітап таңдауға көмек сұра."]},
+  {c:"lang",d:"Казахский",t:"Sóyle: казахский язык",o:"Приложение и онлайн-курс",g:[5,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Курс казахского для тех, кто учится на русском или хочет говорить свободнее.",h:"Установи приложение и занимайся по 10 минут в день.",u:"soyle.kz",
+   k:["Sóyle: қазақ тілі","Қосымша және онлайн курс","Орыс тілінде оқитындарға немесе еркін сөйлегісі келетіндерге арналған қазақ тілі курсы.","Қосымшаны орнатып, күніне 10 минут жаттық."]},
+  {c:"lang",d:"Китайский",t:"Курсы Института Конфуция",o:"ЕНУ (Астана), КазНУ и КазУМОиМЯ им. Абылай хана (Алматы), АРУ им. Жубанова (Актобе), КарТУ (Караганда)",g:[7,11],m:SCHOOL,f:"Очно",p:"Платно, есть дешёвые группы",w:{cities:["astana","almaty","aktobe","karaganda"]},
+   x:"Китайский с преподавателями из Китая. Можно сдать экзамен HSK и участвовать в конкурсе «Мост китайского языка».",h:"Свяжись с ближайшим Институтом Конфуция в начале учебного года.",u:"",
+   k:["Конфуций институтының курстары","ЕҰУ (Астана), ҚазҰУ және Абылай хан атындағы ҚазХҚжӘТУ (Алматы), Жұбанов атындағы АӨУ (Ақтөбе), ҚарТУ (Қарағанды)","Қытайдан келген оқытушылармен қытай тілі. HSK емтиханын тапсырып, «Қытай тілі көпірі» байқауына қатысуға болады.","Оқу жылының басында ең жақын Конфуций институтымен хабарлас."]},
+  {c:"lang",d:"Немецкий",t:"Goethe-Institut и школы PASCH",o:"Goethe-Institut Казахстан",g:[5,11],m:[9,10,11,12,1,2,3,4,5,6,7],f:"Очно / онлайн",p:"Платно",w:{cities:["almaty"],on:true},
+   x:"Курсы немецкого для подростков. В школах-партнёрах PASCH бывают языковые лагеря в Германии.",h:"Посмотри курсы для молодёжи на сайте института.",u:"goethe.de/kasachstan",
+   k:["Goethe-Institut және PASCH мектептері","Goethe-Institut Қазақстан","Жасөспірімдерге арналған неміс тілі курстары. PASCH серіктес мектептерінде Германияда тілдік лагерьлер болады.","Институт сайтынан жастарға арналған курстарды қара."]},
+  {c:"lang",d:"Французский",t:"Alliance Française",o:"Алматы и Астана",g:[5,11],m:SCHOOL,f:"Очно",p:"Платно",w:{cities:["almaty","astana"]},
+   x:"Курсы французского, клубы кино и экзамены DELF Junior.",h:"Запишись на тест уровня в начале семестра.",u:"",
+   k:["Alliance Française","Алматы және Астана","Француз тілі курстары, кино клубтары және DELF Junior емтихандары.","Семестр басында деңгей тестіне жазыл."]},
+  {c:"lang",d:"Корейский",t:"Корейский образовательный центр",o:"Алматы",g:[5,11],m:SCHOOL,f:"Очно",p:"Недорого",w:{cities:["almaty"]},
+   x:"Корейский язык и культура, подготовка к экзамену TOPIK.",h:"Набор групп обычно в сентябре и феврале.",u:"",
+   k:["Корей білім беру орталығы","Алматы","Корей тілі мен мәдениеті, TOPIK емтиханына дайындық.","Топтарға қабылдау әдетте қыркүйек пен ақпанда."]},
+  {c:"lang",d:"Турецкий",t:"Институт Юнуса Эмре",o:"Астана",g:[7,11],m:SCHOOL,f:"Очно",p:"Часто бесплатно",w:{cities:["astana"]},
+   x:"Курсы турецкого языка и культурные мероприятия.",h:"Следи за объявлениями о наборе на сайте института.",u:"",
+   k:["Юнус Эмре институты","Астана","Түрік тілі курстары мен мәдени іс-шаралар.","Институт сайтындағы қабылдау хабарландыруларын бақыла."]},
+  {c:"lang",d:"Любой язык",t:"Duolingo",o:"Приложение",g:[5,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Ежедневная практика любого языка в игровой форме. Хорошо как дополнение к живым занятиям.",h:"Поставь цель 15 минут в день и не прерывай серию.",u:"duolingo.com",
+   k:["Duolingo","Қосымша","Кез келген тілді күн сайын ойын түрінде жаттықтыру. Тірі сабақтарға жақсы қосымша.","Күніне 15 минут мақсат қойып, сериясын үзбе."]},
+
+  {c:"code",d:"Начало",t:"Scratch",o:"MIT, онлайн",g:[5,7],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Собираешь игры и мультфильмы из блоков. Лучший первый шаг в программирование.",h:"Сделай свою первую игру по встроенному уроку.",u:"scratch.mit.edu",
+   k:["Scratch","MIT, онлайн","Блоктардан ойындар мен мультфильмдер құрастырасың. Бағдарламалаудағы ең жақсы алғашқы қадам.","Кірістірілген сабақ бойынша алғашқы ойыныңды жаса."]},
+  {c:"code",d:"IT-школы",t:"KIBERone",o:"IT-школа для детей, 11 городов Казахстана",g:[5,8],m:SCHOOL,f:"Очно",p:"Платно",w:{cities:["almaty","astana","shymkent","atyrau","aktau","aktobe","kokshetau","oral","karaganda","kostanay","oskemen"]},
+   x:"Программирование, создание игр и цифровое творчество для детей 6–14 лет. Занятия обычно по выходным.",h:"Запишись на пробное занятие на сайте своего города.",u:"kiber-one.kz",
+   k:["KIBERone","Балаларға арналған IT-мектеп, Қазақстанның 11 қаласы","6–14 жастағы балаларға бағдарламалау, ойын жасау, цифрлық шығармашылық. Сабақтар әдетте демалыс күндері.","Қалаңның сайтында сынақ сабағына жазыл."]},
+  {c:"code",d:"IT-школы",t:"Алгоритмика",o:"Международная школа программирования",g:[5,11],m:SCHOOL,f:"Очно / онлайн",p:"Платно, пробный урок бесплатно",w:{cities:["almaty","karaganda"],on:true},
+   x:"Scratch, Python, создание игр, веб-разработка и дизайн для детей 6–18 лет. Есть очные группы и онлайн.",h:"Первый пробный урок бесплатный.",u:"almaty.algoritmika.kz",
+   k:["Алгоритмика","Халықаралық бағдарламалау мектебі","6–18 жастағы балаларға Scratch, Python, ойын жасау, веб-әзірлеу және дизайн. Бетпе-бет топтар мен онлайн бар.","Алғашқы сынақ сабағы тегін."]},
+  {c:"code",d:"Python",t:"«Поколение Python»",o:"Stepik",g:[7,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Популярный курс Python на русском с сотнями задач и автоматической проверкой.",h:"Проходи по одному модулю в неделю.",u:"stepik.org",
+   k:["«Поколение Python»","Stepik","Жүздеген есебі және автоматты тексерісі бар, орыс тіліндегі танымал Python курсы.","Аптасына бір модульден өт."]},
+  {c:"code",d:"Олимпиадное",t:"Codeforces",o:"Онлайн-соревнования",g:[7,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Соревнования несколько раз в неделю и рейтинг, который видно всем. Главный тренажёр олимпиадников.",h:"Начни с раундов Div. 3 и Div. 4.",u:"codeforces.com",
+   k:["Codeforces","Онлайн жарыстар","Аптасына бірнеше рет жарыстар және бәріне көрінетін рейтинг. Олимпиадашылардың басты тренажёры.","Div. 3 және Div. 4 раундтарынан баста."]},
+  {c:"code",d:"Олимпиадное",t:"Informatics.msk.ru",o:"Онлайн-задачник",g:[6,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Задачи по темам с теорией: от первых циклов до графов и динамического программирования.",h:"Пройди раздел «Простейшие программы», затем иди по порядку.",u:"informatics.msk.ru",
+   k:["Informatics.msk.ru","Онлайн есептер жинағы","Теориясы бар тақырыптық есептер: алғашқы циклдерден графтар мен динамикалық бағдарламалауға дейін.","«Простейшие программы» бөлімінен өтіп, ретімен жалғастыр."]},
+  {c:"code",d:"Роботы",t:"World Robot Olympiad (WRO)",o:"Национальный отбор → мировой финал",g:[5,11],m:[3,4,5,11],f:"Очно",p:"Через клуб",w:"c",
+   x:"Соревнования роботов из LEGO и Arduino в нескольких возрастных категориях.",h:"Найди кружок робототехники во Дворце школьников или в школе.",u:"wro-association.org",
+   k:["World Robot Olympiad (WRO)","Ұлттық іріктеу → әлемдік финал","Бірнеше жас санатындағы LEGO және Arduino роботтарының жарыстары.","Оқушылар сарайынан немесе мектептен робототехника үйірмесін тап."]},
+  {c:"code",d:"Роботы",t:"FIRST LEGO League",o:"FIRST",g:[5,9],m:[9,10,11,12,1,2],f:"Очно",p:"Через клуб",w:"c",
+   x:"Командное соревнование: робот, исследовательский проект и командная работа.",h:"Нужна команда из 4–10 человек и наставник.",u:"firstlegoleague.org",
+   k:["FIRST LEGO League","FIRST","Командалық жарыс: робот, зерттеу жобасы және командалық жұмыс.","4–10 адамнан тұратын команда және тәлімгер керек."]},
+  {c:"code",d:"Приложения",t:"Technovation Girls",o:"Technovation",g:[5,11],m:[10,11,12,1,2,3,4],f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Команды девочек создают приложение, которое решает проблему их города, вместе с наставником.",h:"Собери команду до 5 человек и зарегистрируйся осенью.",u:"technovation.org",
+   k:["Technovation Girls","Technovation","Қыздар командасы тәлімгермен бірге өз қаласының мәселесін шешетін қосымша жасайды.","5 адамға дейінгі команда жинап, күзде тіркел."]},
+
+  {c:"sci",d:"Проекты",t:"Конкурс исследовательских работ «Зерде»",o:"Центр «Дарын»",g:[5,7],m:[12,1,2,3],f:"Очно",p:"Бесплатно",w:"s",
+   x:"Научные проекты для младших школьников. Учит ставить вопрос, делать эксперимент и защищать результат.",h:"Найди руководителя среди учителей и зарегистрируйся через школу.",u:"daryn.kz",
+   k:["«Зерде» зерттеу жұмыстары байқауы","«Дарын» орталығы","Кіші оқушыларға арналған ғылыми жобалар. Сұрақ қоюды, тәжірибе жасауды және нәтижені қорғауды үйретеді.","Мұғалімдер арасынан жетекші тауып, мектеп арқылы тіркел."]},
+  {c:"sci",d:"Проекты",t:"Республиканский конкурс научных проектов",o:"Центр «Дарын»",g:[8,11],m:[12,1,2,3],f:"Очно",p:"Бесплатно",w:"s",
+   x:"Серьёзная исследовательская работа с научным руководителем. Победители могут поехать на международные научные выставки.",h:"Найди наставника в местном вузе и зарегистрируйся осенью.",u:"daryn.kz",
+   k:["Ғылыми жобалардың республикалық байқауы","«Дарын» орталығы","Ғылыми жетекшімен жасалатын күрделі зерттеу жұмысы. Жеңімпаздар халықаралық ғылыми көрмелерге бара алады.","Жергілікті ЖОО-дан тәлімгер тауып, күзде тіркел."]},
+  {c:"sci",d:"Проекты",t:"Regeneron ISEF",o:"Society for Science, США",g:[9,11],m:[5],f:"Очно, США",p:"Через национальный отбор",w:"s",
+   x:"Крупнейшая в мире научная выставка школьников. Финалистов замечают лучшие университеты.",h:"Попасть можно через аффилированную выставку. Уточни в «Дарыне», какая это в этом году.",u:"societyforscience.org/isef",
+   k:["Regeneron ISEF","Society for Science, АҚШ","Оқушылардың әлемдегі ең ірі ғылыми көрмесі. Финалистерді үздік университеттер байқайды.","Оған аффилиирленген көрме арқылы өтуге болады. Биыл қайсысы екенін «Дарыннан» нақтыла."]},
+  {c:"sci",d:"Хакатон",t:"NASA Space Apps Challenge",o:"NASA",g:[8,11],m:[10],f:"Онлайн / очно",p:"Бесплатно",w:"o",
+   x:"48-часовой хакатон на реальных данных NASA о космосе и Земле.",h:"Присоединись к событию в своём городе или участвуй онлайн.",u:"spaceappschallenge.org",
+   k:["NASA Space Apps Challenge","NASA","Ғарыш пен Жер туралы NASA-ның нақты деректеріне негізделген 48 сағаттық хакатон.","Қалаңдағы іс-шараға қосыл немесе онлайн қатыс."]},
+  {c:"sci",d:"Кружок",t:"Станция юных натуралистов",o:"Городские и областные станции",g:[5,8],m:SCHOOL,f:"Очно",p:"Часто бесплатно",w:"r",
+   x:"Растения, животные, экология и опыты на природе.",h:"Узнай адрес станции в своём городе и запишись в сентябре.",u:"",
+   k:["Жас натуралистер станциясы","Қалалық және облыстық станциялар","Өсімдіктер, жануарлар, экология және табиғаттағы тәжірибелер.","Қалаңдағы станцияның мекенжайын біліп, қыркүйекте жазыл."]},
+  {c:"sci",d:"Онлайн",t:"Симуляции PhET",o:"Университет Колорадо",g:[5,11],m:ALL,f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Интерактивные опыты по физике, химии и биологии прямо в браузере, на русском и казахском.",h:"Открой симуляцию по теме, которую сейчас проходите в школе.",u:"phet.colorado.edu",
+   k:["PhET симуляциялары","Колорадо университеті","Физика, химия және биология бойынша браузердегі интерактивті тәжірибелер, орыс және қазақ тілдерінде.","Мектепте қазір өтіп жатқан тақырып бойынша симуляцияны аш."]},
+
+  {c:"club",d:"Бесплатно",t:"Бесплатный кружок за счёт государства",o:"Подушевое финансирование / ваучер, акимат",g:[5,11],m:ALL,f:"Очно",p:"Бесплатно",w:"c",
+   x:"Государство оплачивает школьникам кружки и секции в частных клубах. В Астане, Шымкенте, Атырау, Актобе, Кызылорде и Караганде работает пилот: один ребёнок получает один ваучер через цифровую платформу.",h:"Родители подают заявку с ИИН ребёнка через портал artsport.edu.kz или новую платформу акимата. Уточни в отделе образования, как это работает в твоём городе.",u:"artsport.edu.kz",
+   k:["Мемлекет есебінен тегін үйірме","Жан басына қаржыландыру / ваучер, әкімдік","Мемлекет оқушыларға жеке клубтардағы үйірмелер мен секцияларды төлейді. Астана, Шымкент, Атырау, Ақтөбе, Қызылорда және Қарағандыда пилоттық жоба жүріп жатыр: бір балаға цифрлық платформа арқылы бір ваучер беріледі.","Ата-ана баланың ЖСН-імен artsport.edu.kz порталы немесе әкімдіктің жаңа платформасы арқылы өтінім береді. Қалаңда қалай жұмыс істейтінін білім бөлімінен нақтыла."]},
+  {c:"club",d:"Дебаты",t:"Дебатный клуб",o:"Школа или молодёжный центр",g:[7,11],m:SCHOOL,f:"Очно",p:"Бесплатно",w:"c",
+   x:"Учит спорить по фактам и выступать публично. Казахстан участвует в чемпионате мира по дебатам среди школьников.",h:"Найди клуб в городе или создай свой в школе.",u:"",
+   k:["Дебат клубы","Мектеп немесе жастар орталығы","Деректерге сүйеніп пікірталасуға және көпшілік алдында сөйлеуге үйретеді. Қазақстан оқушылар арасындағы дебаттан әлем чемпионатына қатысады.","Қаладағы клубты тап немесе мектебіңде өзің аш."]},
+  {c:"club",d:"Дебаты",t:"Чемпионат AmCorners по дебатам",o:"Сеть American Corners",g:[8,11],m:[4,5],f:"Очно",p:"Бесплатно",w:{cities:AMC},
+   x:"Ежегодный чемпионат по дебатам на английском, который проходит в городах с American Corners.",h:"Спроси в American Corner своего города о регистрации весной.",u:"amcorners.kz",
+   k:["AmCorners дебат чемпионаты","American Corners желісі","American Corner бар қалаларда өтетін ағылшын тіліндегі жыл сайынғы дебат чемпионаты.","Көктемде тіркелу туралы қалаңдағы American Corner-ден сұра."]},
+  {c:"club",d:"Дебаты",t:"Модель ООН (MUN)",o:"Конференции в Алматы, Астане и других городах",g:[8,11],m:[10,11,2,3,4],f:"Очно",p:"Иногда взнос",w:"r",
+   x:"Играешь роль дипломата, пишешь резолюции и выступаешь на английском.",h:"Съезди на одну конференцию, потом организуй свою в школе.",u:"",
+   k:["БҰҰ моделі (MUN)","Алматы, Астана және басқа қалалардағы конференциялар","Дипломат рөлін ойнап, қарарлар жазасың және ағылшынша сөйлейсің.","Бір конференцияға барып, кейін мектебіңде өзің ұйымдастыр."]},
+  {c:"club",d:"Шахматы",t:"Шахматная секция",o:"Дворец школьников, шахматные клубы",g:[5,11],m:SCHOOL,f:"Очно",p:"Часто бесплатно",w:"c",
+   x:"Развивает расчёт и концентрацию. Можно играть в турнирах и получать разряды.",h:"Запишись в секцию и играй на lichess.org между занятиями.",u:"lichess.org",
+   k:["Шахмат секциясы","Оқушылар сарайы, шахмат клубтары","Есептеу мен зейінді дамытады. Турнирлерде ойнап, разряд алуға болады.","Секцияға жазылып, сабақ арасында lichess.org-та ойна."]},
+  {c:"club",d:"Медиа",t:"Школьная газета или подкаст",o:"Создай в своей школе",g:[5,11],m:SCHOOL,f:"Очно",p:"Бесплатно",w:"s",
+   x:"Пишешь, берёшь интервью, монтируешь. Хороший пример лидерства для портфолио.",h:"Предложи идею завучу и собери редакцию из 3–5 человек.",u:"",
+   k:["Мектеп газеті немесе подкаст","Мектебіңде өзің құр","Жазасың, сұхбат аласың, монтаж жасайсың. Портфолио үшін көшбасшылықтың жақсы мысалы.","Идеяны оқу ісінің меңгерушісіне ұсынып, 3–5 адамнан редакция жина."]},
+  {c:"club",d:"Волонтёрство",t:"Молодёжный ресурсный центр",o:"При акимате твоего региона",g:[7,11],m:ALL,f:"Очно",p:"Бесплатно",w:"c",
+   x:"Волонтёрские проекты, тренинги и события. Важнее заниматься одним делом долго, чем многим понемногу.",h:"Подпишись на соцсети центра в своём городе.",u:"",
+   k:["Жастар ресурстық орталығы","Өңіріңдегі әкімдік жанында","Еріктілер жобалары, тренингтер және іс-шаралар. Көп іспен аз-аздан емес, бір іспен ұзақ айналысқан маңыздырақ.","Қалаңдағы орталықтың әлеуметтік желілеріне жазыл."]},
+  {c:"club",d:"Эссе",t:"Конкурс эссе John Locke Institute",o:"Великобритания, на английском",g:[9,11],m:[4,5,6],f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Эссе по философии, политике, экономике, истории. Работы читают преподаватели Оксфорда.",h:"Темы публикуют в начале года, дедлайн обычно в конце июня.",u:"johnlockeinstitute.com",
+   k:["John Locke Institute эссе байқауы","Ұлыбритания, ағылшын тілінде","Философия, саясат, экономика, тарих бойынша эссе. Жұмыстарды Оксфорд оқытушылары оқиды.","Тақырыптар жыл басында жарияланады, дедлайн әдетте маусымның соңында."]},
+  {c:"club",d:"Творчество",t:"Художественная и музыкальная школа",o:"Городские детские школы искусств",g:[5,11],m:SCHOOL,f:"Очно",p:"Недорого",w:"c",
+   x:"Рисование, музыка, дизайн. Творческое портфолио ценится при поступлении на архитектуру и дизайн.",h:"Набор обычно в конце августа и в сентябре.",u:"",
+   k:["Өнер мектебі және музыка мектебі","Қалалық балалар өнер мектептері","Сурет, музыка, дизайн. Шығармашылық портфолио сәулет пен дизайнға түскенде бағаланады.","Қабылдау әдетте тамыздың соңы мен қыркүйекте."]},
+
+  {c:"summer",d:"Казахстан",t:"«Балдаурен»: республиканский учебно-оздоровительный центр",o:"Бурабай (Щучинск), Конаев (Капшагай), Шымкент, Балхаш",g:[5,10],m:ALL,f:"Очно, с проживанием",p:"Бесплатно по путёвке",w:{cities:["shchuchinsk","konaev","shymkent","balkhash"]},
+   x:"Тематические смены круглый год для одарённых детей 11–16 лет: проекты, конкурсы, отдых у озера. Путёвки на конкурсной основе распределяет Министерство просвещения.",h:"Спроси в школе или отделе образования, как получить путёвку по итогам олимпиад и конкурсов.",u:"baldauren.kz",
+   k:["«Балдаурен» республикалық оқу-сауықтыру орталығы","Бурабай (Щучинск), Қонаев (Қапшағай), Шымкент, Балқаш","11–16 жастағы дарынды балаларға жыл бойы тақырыптық ауысымдар: жобалар, байқаулар, көл жағасында демалыс. Жолдамаларды байқау негізінде Оқу-ағарту министрлігі бөледі.","Олимпиадалар мен байқаулар қорытындысы бойынша жолдаманы қалай алуға болатынын мектептен немесе білім бөлімінен сұра."]},
+  {c:"summer",d:"Казахстан",t:"Летние олимпиадные сборы",o:"РФМШ, НИШ, региональные центры «Дарын»",g:[7,11],m:[6,7,8],f:"Очно",p:"Уточняй",w:"r",
+   x:"Интенсивная подготовка к олимпиадам летом. Обычно приглашают по результатам олимпиад.",h:"Хорошо выступи на областном этапе и спроси учителя о приглашениях.",u:"",
+   k:["Жазғы олимпиадалық жиындар","РФМШ, НЗМ, өңірлік «Дарын» орталықтары","Жазда олимпиадаға қарқынды дайындық. Әдетте олимпиада нәтижелері бойынша шақырады.","Облыстық кезеңде жақсы нәтиже көрсетіп, шақыру туралы мұғалімнен сұра."]},
+  {c:"summer",d:"Онлайн",t:"Летний онлайн-челлендж",o:"Stepik, Khan Academy, AoPS",g:[5,11],m:[6,7,8],f:"Онлайн",p:"Бесплатно",w:"o",
+   x:"Пройди за лето один полный курс: Python, алгебру или подготовку к олимпиаде. Это видно по сертификату.",h:"Выбери один курс и заранее запиши, сколько уроков в неделю будешь проходить.",u:"",
+   k:["Жазғы онлайн челлендж","Stepik, Khan Academy, AoPS","Жаз бойы бір толық курстан өт: Python, алгебра немесе олимпиадаға дайындық. Бұл сертификаттан көрінеді.","Бір курс таңдап, аптасына неше сабақ өтетініңді алдын ала жазып қой."]},
+  {c:"summer",d:"За рубежом",t:"Research Science Institute (MIT)",o:"MIT, США",g:[10,11],m:[1,6,7],f:"Очно, США",p:"Бесплатно",w:"a",
+   x:"Шесть недель настоящих исследований в MIT. Одна из самых престижных летних программ в мире.",h:"Подача заявки зимой. Нужны отличные оценки и олимпиадные результаты.",u:"cee.org",
+   k:["Research Science Institute (MIT)","MIT, АҚШ","MIT-те алты апта нағыз зерттеу. Әлемдегі ең беделді жазғы бағдарламалардың бірі.","Өтінім қыста беріледі. Үздік бағалар мен олимпиада нәтижелері керек."]},
+  {c:"summer",d:"За рубежом",t:"Canada/USA Mathcamp",o:"США",g:[8,11],m:[3,7,8],f:"Очно, США",p:"Есть полная финансовая помощь",w:"a",
+   x:"Летняя математическая школа с необычными темами. Для поступления решаешь вступительную задачу-квиз.",h:"Квиз выходит весной, его нужно приложить к заявке.",u:"mathcamp.org",
+   k:["Canada/USA Mathcamp","АҚШ","Ерекше тақырыптары бар жазғы математика мектебі. Түсу үшін кіріспе квиз-есептерді шешесің.","Квиз көктемде шығады, оны өтінімге тіркеу керек."]},
+  {c:"summer",d:"За рубежом",t:"Summer Science Program",o:"США",g:[10,11],m:[2,6,7],f:"Очно, США",p:"Есть финансовая помощь",w:"a",
+   x:"Исследования по астрофизике, биохимии или геномике в команде из трёх человек.",h:"Подача заявки зимой.",u:"summerscience.org",
+   k:["Summer Science Program","АҚШ","Үш адамдық командада астрофизика, биохимия немесе геномика бойынша зерттеу.","Өтінім қыста беріледі."]},
+
+  {c:"exam",d:"Школы",t:"Вступительные экзамены в НИШ",o:"Назарбаев Интеллектуальные школы",g:[6,6],m:[1,2,3],f:"Очно / компьютерный тест",p:"Бесплатно",w:"nis",
+   x:"Поступают в основном в 7 класс, поэтому экзамен сдают в 6-м. Проверяют количественные и логические навыки и языки.",h:"Регистрация обычно зимой. Смотри объявления на сайте НИШ.",u:"nis.edu.kz",
+   k:["НЗМ-ге түсу емтихандары","Назарбаев Зияткерлік мектептері","Негізінен 7-сыныпқа қабылдайды, сондықтан емтиханды 6-сыныпта тапсырады. Сандық және логикалық дағдылар мен тілдер тексеріледі.","Тіркеу әдетте қыста. НЗМ сайтындағы хабарландыруларды қара."]},
+  {c:"exam",d:"Школы",t:"Поступление в БИЛ (Білім-инновация лицеи)",o:"Сеть БИЛ",g:[6,6],m:[3,4,5],f:"Очно",p:"Бесплатно",w:"r",
+   x:"Лицеи с сильной математикой и естественными науками. Основной набор в 7 класс.",h:"Следи за объявлениями лицея своего региона весной.",u:"",
+   k:["БИЛ-ге түсу (Білім-инновация лицейлері)","БИЛ желісі","Математикасы мен жаратылыстану ғылымдары күшті лицейлер. Негізгі қабылдау 7-сыныпқа.","Көктемде өз өңіріңдегі лицейдің хабарландыруларын бақыла."]},
+  {c:"exam",d:"Школы",t:"Поступление в РФМШ",o:"Республиканская физико-математическая школа",g:[6,8],m:[3,4,5],f:"Очно",p:"Бесплатно",w:{cities:["almaty","astana"]},
+   x:"Школа для сильных в математике и физике. Принимает по экзаменам и олимпиадным результатам.",h:"Уточни на сайте школы, в какие классы набор в этом году.",u:"fizmat.kz",
+   k:["РФМШ-ға түсу","Республикалық физика-математика мектебі","Математика мен физикадан күшті оқушыларға арналған мектеп. Емтихан және олимпиада нәтижелері бойынша қабылдайды.","Биыл қай сыныптарға қабылдау барын мектеп сайтынан нақтыла."]},
+  {c:"exam",d:"Вузы",t:"ЕНТ",o:"Национальный центр тестирования",g:[11,11],m:[1,2,3,6,7],f:"Компьютерный тест",p:"Бесплатно (основная сессия)",w:"r",
+   x:"Единое национальное тестирование для поступления в вузы Казахстана и на гранты. Зимние сессии дают шанс попробовать заранее.",h:"Регистрируйся на сайте НЦТ и пройди хотя бы один пробный тест.",u:"testcenter.kz",
+   k:["ҰБТ","Ұлттық тестілеу орталығы","Қазақстан ЖОО-ларына және грантқа түсуге арналған ұлттық бірыңғай тестілеу. Қысқы сессиялар алдын ала байқап көруге мүмкіндік береді.","ҰТО сайтында тіркеліп, кемінде бір сынақ тестін тапсыр."]},
+  {c:"exam",d:"Вузы",t:"IELTS",o:"British Council, IDP",g:[9,11],m:ALL,f:"Очно, Алматы, Астана и другие города",p:"Платно",w:"r",
+   x:"Экзамен по английскому для поступления в Nazarbayev University и зарубежные вузы. Результат действует 2 года.",h:"Сдавай в 10–11 классе, чтобы результат был действителен при подаче.",u:"ielts.org",
+   k:["IELTS","British Council, IDP","Nazarbayev University мен шетелдік ЖОО-ларға түсуге арналған ағылшын тілі емтиханы. Нәтиже 2 жыл жарамды.","Өтінім берген кезде нәтиже жарамды болуы үшін 10–11 сыныпта тапсыр."]},
+  {c:"exam",d:"Вузы",t:"SAT",o:"College Board",g:[10,11],m:[3,5,6,8,10,11,12],f:"Компьютерный тест, тестовые центры",p:"Платно",w:{cities:["almaty","astana"]},
+   x:"Тест для поступления в вузы США. Многие вузы не требуют его, но хороший балл помогает.",h:"Бесплатная подготовка: Khan Academy + пробные тесты Bluebook.",u:"collegeboard.org",
+   k:["SAT","College Board","АҚШ ЖОО-ларына түсуге арналған тест. Көп ЖОО оны талап етпейді, бірақ жақсы балл көмектеседі.","Тегін дайындық: Khan Academy + Bluebook сынақ тестері."]},
+];
+
+// Короткие значения (направление, формат, цена) на казахском
+const KK = {
+  "Все предметы":"Барлық пәндер","Информатика":"Информатика","Математика":"Математика","Физика":"Физика","Химия":"Химия","Биология":"Биология","География":"География",
+  "Математика · Физика · Информатика":"Математика · Физика · Информатика","Физика · Химия · Биология":"Физика · Химия · Биология",
+  "Кружок":"Үйірме","Курсы":"Курстар","Онлайн":"Онлайн","Английский":"Ағылшын","Казахский":"Қазақ","Китайский":"Қытай","Немецкий":"Неміс","Французский":"Француз","Корейский":"Корей","Турецкий":"Түрік","Любой язык":"Кез келген тіл",
+  "Начало":"Бастау","Python":"Python","Олимпиадное":"Олимпиадалық","Роботы":"Роботтар","Приложения":"Қосымшалар","IT-школы":"IT-мектептер","Проекты":"Жобалар","Хакатон":"Хакатон",
+  "Дебаты":"Дебат","Шахматы":"Шахмат","Медиа":"Медиа","Волонтёрство":"Еріктілік","Эссе":"Эссе","Творчество":"Шығармашылық","Бесплатно":"Тегін","Казахстан":"Қазақстан","За рубежом":"Шетелде","Школы":"Мектептер","Вузы":"ЖОО",
+  "Олимпиады":"Олимпиадалар","Сильные школы":"Күшті мектептер","Кружки":"Үйірмелер","Языки":"Тілдер","Наука":"Ғылым","История":"Тарих","Природа":"Табиғат","IT":"IT","Гуманитарное":"Гуманитарлық","Бесплатные кружки":"Тегін үйірмелер",
+  "Очно":"Бетпе-бет","Онлайн в школе":"Мектепте онлайн","В школе":"Мектепте","Онлайн / в школе":"Онлайн / мектепте","Очно, Алматы":"Бетпе-бет, Алматы","Письменно, в Казахстане":"Жазбаша, Қазақстанда",
+  "Очно, за рубежом":"Бетпе-бет, шетелде","Очно / онлайн":"Бетпе-бет / онлайн","Онлайн / очно":"Онлайн / бетпе-бет","Очно, США":"Бетпе-бет, АҚШ","Очно / компьютерный тест":"Бетпе-бет / компьютерлік тест",
+  "Компьютерный тест":"Компьютерлік тест","Очно, Алматы, Астана и другие города":"Бетпе-бет, Алматы, Астана және басқа қалалар","Компьютерный тест, тестовые центры":"Компьютерлік тест, тест орталықтары","Очно, с проживанием":"Бетпе-бет, тұратын орнымен",
+  "Небольшой взнос":"Шағын жарна","Платно":"Ақылы","Через школу":"Мектеп арқылы","Для сборной":"Құрама үшін","Уточняй":"Нақтыла","Часто бесплатно":"Көбіне тегін","Форум бесплатно, курсы платно":"Форум тегін, курстар ақылы",
+  "Есть бесплатные материалы":"Тегін материалдар бар","Платно, есть дешёвые группы":"Ақылы, арзан топтар бар","Недорого":"Арзан","Через клуб":"Клуб арқылы","Через национальный отбор":"Ұлттық іріктеу арқылы","Иногда взнос":"Кейде жарна",
+  "Есть полная финансовая помощь":"Толық қаржылай көмек бар","Есть финансовая помощь":"Қаржылай көмек бар","Бесплатно (основная сессия)":"Тегін (негізгі сессия)","Платно, пробный урок бесплатно":"Ақылы, сынақ сабағы тегін","Бесплатно по путёвке":"Жолдама бойынша тегін",
+};
+
+const REGIONS = [
+  {id:"astana",ru:"Астана",kk:"Астана",center:"astana",e:["Инженерия холодного города","Астана — одна из самых холодных столиц мира. Измерь теплопотери школы или изучи, как районы города защищены от ветра и снега.","Суық қаланың инженериясы","Астана — әлемдегі ең суық астаналардың бірі. Мектептің жылу шығынын өлше немесе қала аудандарының желден және қардан қалай қорғалғанын зертте."]},
+  {id:"almaty",ru:"Алматы",kk:"Алматы",center:"almaty",e:["Смог и сейсмика","Собери дешёвые датчики PM2.5 по своему району или сопоставь здания школ с картой сейсмических зон.","Түтін мен сейсмика","Ауданыңда арзан PM2.5 датчиктерін жина немесе мектеп ғимараттарын сейсмикалық аймақтар картасымен салыстыр."]},
+  {id:"shymkent",ru:"Шымкент",kk:"Шымкент",center:"shymkent",e:["Вода для юга","Сравни урожай при капельном и обычном поливе или измерь потери воды в арыках.","Оңтүстікке су","Тамшылатып және кәдімгі суарғандағы өнімді салыстыр немесе арықтардағы су шығынын өлше."]},
+  {id:"abai",ru:"Абайская область",kk:"Абай облысы",center:"semey",e:["Жизнь после Полигона","Изучи наследие Семипалатинского полигона: измерь радиационный фон школьным дозиметром или поработай с данными о здоровье вместе с медуниверситетом.","Полигоннан кейінгі өмір","Семей полигонының мұрасын зертте: мектеп дозиметрімен радиациялық фонды өлше немесе медициналық университетпен бірге денсаулық деректерімен жұмыс істе."]},
+  {id:"akmola",ru:"Акмолинская область",kk:"Ақмола облысы",center:"kokshetau",e:["Туризм и Бурабай","Посчитай туристов, мусор и прозрачность воды на озёрах Бурабая за сезон.","Туризм және Бурабай","Маусым бойы Бурабай көлдеріндегі туристерді, қоқысты және судың мөлдірлігін есепте."]},
+  {id:"aktobe",ru:"Актюбинская область",kk:"Ақтөбе облысы",center:"aktobe",e:["Хром в грунтовых водах","Сделай дешёвый колориметрический тест на хром и проверь его в лаборатории вуза.","Жерасты суындағы хром","Хромға арзан колориметриялық тест жасап, оны ЖОО зертханасында тексер."]},
+  {id:"almobl",ru:"Алматинская область",kk:"Алматы облысы",center:"konaev",e:["Капшагайское водохранилище","Изучи уровень воды, летнее цветение водорослей и влияние водохранилища на Балхаш.","Қапшағай су қоймасы","Су деңгейін, жазғы балдырлардың гүлденуін және су қоймасының Балқашқа әсерін зертте."]},
+  {id:"atyrau",ru:"Атырауская область",kk:"Атырау облысы",center:"atyrau",e:["Осетры Каспия","Изучи дельту Урала, рыборазведение или химию ликвидации нефтяных разливов.","Каспий бекірелері","Жайық атырауын, балық өсіруді немесе мұнай төгілуін жою химиясын зертте."]},
+  {id:"east",ru:"Восточно-Казахстанская область",kk:"Шығыс Қазақстан облысы",center:"oskemen",e:["Алтай против заводов","Проведи лишайниковую индикацию воздуха от центра города к предгорьям Алтая.","Алтай және зауыттар","Қала орталығынан Алтай бөктеріне дейін қына арқылы ауа сапасын анықта."]},
+  {id:"zhambyl",ru:"Жамбылская область",kk:"Жамбыл облысы",center:"taraz",e:["Археология Шёлкового пути","Оцифруй находки с помощью фотограмметрии или изучи влияние фосфорной промышленности на почву.","Жібек жолы археологиясы","Олжаларды фотограмметриямен цифрла немесе фосфор өнеркәсібінің топыраққа әсерін зертте."]},
+  {id:"zhetysu",ru:"Жетысуская область",kk:"Жетісу облысы",center:"taldykorgan",e:["Солёно-пресный Балхаш","Изучи, как полив вдоль реки Или влияет на уровень и солёность Балхаша.","Тұщы-тұзды Балқаш","Іле өзенінің бойындағы суарудың Балқаштың деңгейі мен тұздылығына әсерін зертте."]},
+  {id:"west",ru:"Западно-Казахстанская область",kk:"Батыс Қазақстан облысы",center:"oral",e:["Соседи Карачаганака","Сравни качество воздуха в сёлах рядом с месторождением или изучи поймы реки Жайык.","Қарашығанақтың көршілері","Кен орнына жақын ауылдардағы ауа сапасын салыстыр немесе Жайық өзенінің жайылмаларын зертте."]},
+  {id:"karaganda",ru:"Карагандинская область",kk:"Қарағанды облысы",center:"karaganda",e:["Угольный город меняется","Изучи метан из закрытых шахт, просадки грунта или переобучение бывших шахтёров.","Көмір қаласы өзгеріп жатыр","Жабылған шахталардағы метанды, жердің шөгуін немесе бұрынғы шахтерлердің қайта оқуын зертте."]},
+  {id:"kostanay",ru:"Костанайская область",kk:"Қостанай облысы",center:"kostanay",e:["Зерно и засуха","Сравни засухоустойчивость сортов пшеницы или оцени посевы по бесплатным снимкам Sentinel-2.","Астық және құрғақшылық","Бидай сорттарының құрғақшылыққа төзімділігін салыстыр немесе егістікті тегін Sentinel-2 суреттері бойынша бағала."]},
+  {id:"kyzylorda",ru:"Кызылординская область",kk:"Қызылорда облысы",center:"kyzylorda",e:["Возвращение Арала","Изучи солёность Малого Арала, улов рыбы в Аральске или пыльные бури с осушенного дна.","Аралдың оралуы","Кіші Аралдың тұздылығын, Аралдағы балық аулауды немесе құрғаған табаннан көтерілетін шаңды дауылдарды зертте."]},
+  {id:"mangystau",ru:"Мангистауская область",kk:"Маңғыстау облысы",center:"aktau",e:["Опреснение и каспийский тюлень","Собери солнечный опреснитель или проанализируй выбросы тюленей на побережье.","Тұщыландыру және Каспий итбалығы","Күн энергиясымен жұмыс істейтін тұщытқыш жаса немесе жағалауға шыққан итбалықтарды талда."]},
+  {id:"pavlodar",ru:"Павлодарская область",kk:"Павлодар облысы",center:"pavlodar",e:["Промышленность на Иртыше","Возьми пробы воды выше и ниже промзоны или сравни загрязнение снега по районам.","Ертістегі өнеркәсіп","Өнеркәсіп аймағының жоғары және төменгі жағынан су сынамаларын ал немесе аудандар бойынша қардың ластануын салыстыр."]},
+  {id:"north",ru:"Северо-Казахстанская область",kk:"Солтүстік Қазақстан облысы",center:"petropavl",e:["Пересыхающие озёра","Отследи площадь местных озёр по архиву снимков Landsat с 1980-х годов.","Тартылып жатқан көлдер","1980 жылдардан бергі Landsat суреттер мұрағаты бойынша жергілікті көлдердің ауданын бақыла."]},
+  {id:"turkistan",ru:"Туркестанская область",kk:"Түркістан облысы",center:"turkestan",e:["Наследие под нагрузкой","Изучи, как туризм меняет старый город, или разрушение исторического кирпича солью и влагой.","Мұраға түсетін салмақ","Туризмнің ескі қаланы қалай өзгертетінін немесе тарихи кірпіштің тұз бен ылғалдан бұзылуын зертте."]},
+  {id:"ulytau",ru:"Улытауская область",kk:"Ұлытау облысы",center:"zhezkazgan",e:["Медь и хвосты","Проверь почву и воду у хвостохранилищ на тяжёлые металлы или посчитай, сколько меди уходит в отходы.","Мыс және қалдықтар","Қалдық қоймалары маңындағы топырақ пен суды ауыр металдарға тексер немесе қалдыққа қанша мыс кететінін есепте."]},
+];
+
+// k: rep = город республиканского значения, center = областной центр, town = город, village = село
+// ex: [направление, название RU, описание RU, название KK, описание KK]
+const PLACES = [
+  {id:"astana",r:"astana",ru:"Астана",kk:"Астана",k:"rep",lat:51.17,lon:71.45,nis:true,uni:["Назарбаев Университет, ЕНУ им. Гумилёва, Astana IT University","Назарбаев Университеті, Л.Н. Гумилев атындағы ЕҰУ, Astana IT University"],
+   ex:[["Кружки","Дворец школьников Астаны","Около 120 кружков и секций, из них часть бесплатные (бюджетные), остальные платные.","Астана оқушылар сарайы","120-ға жуық үйірме мен секция, оның бір бөлігі тегін (бюджеттік), қалғаны ақылы."],
+       ["IT","Astana Hub","Технопарк проводит открытые мероприятия и хакатоны для школьников.","Astana Hub","Технопарк оқушыларға арналған ашық іс-шаралар мен хакатондар өткізеді."],
+       ["Олимпиады","Филиал РФМШ","Олимпиадная подготовка по математике, физике и информатике.","РФМШ филиалы","Математика, физика және информатикадан олимпиадаға дайындық."]]},
+  {id:"almaty",r:"almaty",ru:"Алматы",kk:"Алматы",k:"rep",lat:43.24,lon:76.89,nis:true,uni:["КБТУ, КазНУ им. аль-Фараби, Satbayev University, КазУМОиМЯ им. Абылай хана","ҚБТУ, әл-Фараби атындағы ҚазҰУ, Satbayev University, Абылай хан атындағы ҚазХҚжӘТУ"],
+   ex:[["Олимпиады","РФМШ","Здесь каждый январь проходит Международная Жаутыковская олимпиада.","РФМШ","Мұнда жыл сайын қаңтарда Халықаралық Жәутіков олимпиадасы өтеді."]]},
+  {id:"shymkent",r:"shymkent",ru:"Шымкент",kk:"Шымкент",k:"rep",lat:42.32,lon:69.59,nis:true,uni:["ЮКУ им. М. Ауэзова","М. Әуезов атындағы ОҚУ"]},
+
+  {id:"semey",r:"abai",ru:"Семей",kk:"Семей",k:"center",lat:50.41,lon:80.25,nis:true,uni:["Университет Шакарима, Медицинский университет Семей","Шәкәрім университеті, Семей медицина университеті"],
+   ex:[["Гуманитарное","Наследие Абая и Шакарима","Музей Абая, литературные чтения и конкурсы эссе. Сильная база для олимпиады по казахской литературе.","Абай мен Шәкәрім мұрасы","Абай музейі, әдеби оқулар мен эссе байқаулары. Қазақ әдебиеті олимпиадасына мықты негіз."]]},
+  {id:"ayagoz",r:"abai",ru:"Аягоз",kk:"Аягөз",k:"town",lat:47.97,lon:80.44},
+  {id:"kurchatov",r:"abai",ru:"Курчатов",kk:"Курчатов",k:"town",lat:50.76,lon:78.54,
+   ex:[["Наука","Национальный ядерный центр РК","Город учёных-ядерщиков. Музей и специалисты центра — уникальная база для проектов по физике и экологии.","ҚР Ұлттық ядролық орталығы","Ядрошы ғалымдар қаласы. Орталықтың музейі мен мамандары физика мен экология жобаларына бірегей негіз."]]},
+
+  {id:"kokshetau",r:"akmola",ru:"Кокшетау",kk:"Көкшетау",k:"center",lat:53.28,lon:69.39,nis:true,uni:["Кокшетауский университет им. Ш. Уалиханова","Ш. Уәлиханов атындағы Көкшетау университеті"]},
+  {id:"stepnogorsk",r:"akmola",ru:"Степногорск",kk:"Степногорск",k:"town",lat:52.35,lon:71.89},
+  {id:"shchuchinsk",r:"akmola",ru:"Щучинск",kk:"Щучинск",k:"town",lat:52.94,lon:70.20,
+   ex:[["Природа","Курортная зона Бурабай рядом","Озёра и леса для полевых проектов по биологии и экологии.","Бурабай курорттық аймағы жақын","Биология мен экология бойынша далалық жобаларға арналған көлдер мен ормандар."]]},
+  {id:"atbasar",r:"akmola",ru:"Атбасар",kk:"Атбасар",k:"town",lat:51.81,lon:68.36},
+
+  {id:"aktobe",r:"aktobe",ru:"Актобе",kk:"Ақтөбе",k:"center",lat:50.28,lon:57.17,nis:true,uni:["АРУ им. К. Жубанова, ЗКМУ им. М. Оспанова","Қ. Жұбанов атындағы АӨУ, М. Оспанов атындағы БҚМУ"],
+   ex:[["Кружки","Городской дворец школьников Актобе","Более 2000 детей занимаются в кружках и студиях.","Ақтөбе қалалық оқушылар сарайы","2000-нан астам бала үйірмелер мен студияларда оқиды."]]},
+  {id:"khromtau",r:"aktobe",ru:"Хромтау",kk:"Хромтау",k:"town",lat:50.25,lon:58.44},
+  {id:"kandyagash",r:"aktobe",ru:"Кандыагаш",kk:"Қандыағаш",k:"town",lat:49.47,lon:57.42},
+
+  {id:"konaev",r:"almobl",ru:"Конаев",kk:"Қонаев",k:"center",lat:43.87,lon:77.07},
+  {id:"kaskelen",r:"almobl",ru:"Каскелен",kk:"Қаскелең",k:"town",lat:43.20,lon:76.62,uni:["SDU University","SDU University"]},
+  {id:"talgar",r:"almobl",ru:"Талгар",kk:"Талғар",k:"town",lat:43.30,lon:77.24},
+  {id:"esik",r:"almobl",ru:"Есик",kk:"Есік",k:"town",lat:43.36,lon:77.45},
+
+  {id:"atyrau",r:"atyrau",ru:"Атырау",kk:"Атырау",k:"center",lat:47.11,lon:51.92,nis:true,uni:["Атырауский университет нефти и газа им. С. Утебаева, Атырауский университет им. Х. Досмухамедова","С. Өтебаев атындағы Атырау мұнай және газ университеті, Х. Досмұхамедов атындағы Атырау университеті"],
+   ex:[["Наука","Нефтегазовые компании","Крупные операторы Тенгиза и Кашагана поддерживают школьные STEM-программы и стипендии.","Мұнай-газ компаниялары","Теңіз бен Қашағанның ірі операторлары мектептік STEM бағдарламалары мен стипендияларды қолдайды."]]},
+  {id:"kulsary",r:"atyrau",ru:"Кульсары",kk:"Құлсары",k:"town",lat:46.95,lon:54.02},
+
+  {id:"oskemen",r:"east",ru:"Усть-Каменогорск",kk:"Өскемен",k:"center",lat:49.95,lon:82.61,nis:true,uni:["ВКТУ им. Д. Серикбаева, ВКУ им. С. Аманжолова","Д. Серікбаев атындағы ШҚТУ, С. Аманжолов атындағы ШҚУ"]},
+  {id:"ridder",r:"east",ru:"Риддер",kk:"Риддер",k:"town",lat:50.34,lon:83.51},
+  {id:"altai",r:"east",ru:"Алтай (Зыряновск)",kk:"Алтай",k:"town",lat:49.72,lon:84.27},
+
+  {id:"taraz",r:"zhambyl",ru:"Тараз",kk:"Тараз",k:"center",lat:42.90,lon:71.37,nis:true,uni:["Таразский университет им. М.Х. Дулати","М.Х. Дулати атындағы Тараз университеті"]},
+  {id:"shu",r:"zhambyl",ru:"Шу",kk:"Шу",k:"town",lat:43.60,lon:73.76},
+  {id:"karatau",r:"zhambyl",ru:"Каратау",kk:"Қаратау",k:"town",lat:43.18,lon:70.46},
+  {id:"zhanatas",r:"zhambyl",ru:"Жанатас",kk:"Жаңатас",k:"town",lat:43.57,lon:69.73},
+
+  {id:"taldykorgan",r:"zhetysu",ru:"Талдыкорган",kk:"Талдықорған",k:"center",lat:45.02,lon:78.37,nis:true,uni:["Жетысуский университет им. И. Жансугурова","І. Жансүгіров атындағы Жетісу университеті"]},
+  {id:"tekeli",r:"zhetysu",ru:"Текели",kk:"Текелі",k:"town",lat:44.83,lon:78.82},
+  {id:"zharkent",r:"zhetysu",ru:"Жаркент",kk:"Жаркент",k:"town",lat:44.16,lon:80.00,
+   ex:[["Языки","Рядом граница с Китаем и Хоргос","Китайский язык здесь особенно полезен: ищи онлайн-курсы и HSK.","Қытай шекарасы мен Қорғас жақын","Мұнда қытай тілі ерекше пайдалы: онлайн курстар мен HSK-ны ізде."]]},
+  {id:"usharal",r:"zhetysu",ru:"Ушарал",kk:"Үшарал",k:"town",lat:46.17,lon:80.94},
+
+  {id:"oral",r:"west",ru:"Уральск",kk:"Орал",k:"center",lat:51.23,lon:51.37,nis:true,uni:["ЗКУ им. М. Утемисова, ЗКАТУ им. Жангир хана","М. Өтемісов атындағы БҚУ, Жәңгір хан атындағы БҚАТУ"]},
+  {id:"aksai",r:"west",ru:"Аксай",kk:"Ақсай",k:"town",lat:51.17,lon:52.99,
+   ex:[["Наука","Карачаганакское месторождение рядом","Тема для проектов по экологии и энергетике.","Қарашығанақ кен орны жақын","Экология мен энергетика жобаларына тақырып."]]},
+
+  {id:"karaganda",r:"karaganda",ru:"Караганда",kk:"Қарағанды",k:"center",lat:49.80,lon:73.10,nis:true,uni:["КарУ им. Букетова, КарТУ им. Сагинова, Медицинский университет Караганды","Бөкетов атындағы ҚарУ, Сағынов атындағы ҚарТУ, Қарағанды медицина университеті"],
+   ex:[["История","Музей памяти жертв репрессий (Долинка)","Материал для исследовательских работ по истории.","Саяси қуғын-сүргін құрбандарын еске алу музейі (Долинка)","Тарих бойынша зерттеу жұмыстарына материал."]]},
+  {id:"temirtau",r:"karaganda",ru:"Темиртау",kk:"Теміртау",k:"town",lat:50.05,lon:72.96,uni:["Карагандинский индустриальный университет","Қарағанды индустриялық университеті"],
+   ex:[["Наука","Металлургический комбинат","Тема для проектов по химии, экологии и инженерии.","Металлургиялық комбинат","Химия, экология және инженерия жобаларына тақырып."]]},
+  {id:"balkhash",r:"karaganda",ru:"Балхаш",kk:"Балқаш",k:"town",lat:46.85,lon:74.98,
+   ex:[["Природа","Озеро Балхаш и медеплавильный завод","Проекты по экологии озера и промышленности.","Балқаш көлі және мыс балқыту зауыты","Көл экологиясы мен өнеркәсіп бойынша жобалар."]]},
+  {id:"saran",r:"karaganda",ru:"Сарань",kk:"Саран",k:"town",lat:49.79,lon:72.84},
+  {id:"shakhtinsk",r:"karaganda",ru:"Шахтинск",kk:"Шахтинск",k:"town",lat:49.71,lon:72.59},
+
+  {id:"kostanay",r:"kostanay",ru:"Костанай",kk:"Қостанай",k:"center",lat:53.21,lon:63.62,nis:true,uni:["Костанайский региональный университет им. А. Байтурсынова","А. Байтұрсынұлы атындағы Қостанай өңірлік университеті"]},
+  {id:"rudny",r:"kostanay",ru:"Рудный",kk:"Рудный",k:"town",lat:52.97,lon:63.12,uni:["Рудненский индустриальный университет","Рудный индустриялық университеті"]},
+  {id:"lisakovsk",r:"kostanay",ru:"Лисаковск",kk:"Лисаковск",k:"town",lat:52.54,lon:62.49},
+  {id:"arkalyk",r:"kostanay",ru:"Аркалык",kk:"Арқалық",k:"town",lat:50.25,lon:66.91,uni:["Аркалыкский педагогический институт им. И. Алтынсарина","Ы. Алтынсарин атындағы Арқалық педагогикалық институты"]},
+
+  {id:"kyzylorda",r:"kyzylorda",ru:"Кызылорда",kk:"Қызылорда",k:"center",lat:44.85,lon:65.51,nis:true,uni:["Кызылординский университет им. Коркыт Ата","Қорқыт Ата атындағы Қызылорда университеті"]},
+  {id:"aralsk",r:"kyzylorda",ru:"Аральск",kk:"Арал",k:"town",lat:46.80,lon:61.67,
+   ex:[["Природа","Малое Аральское море","Музей Арала и рыбаки — живые данные для проектов по экологии.","Кіші Арал теңізі","Арал музейі мен балықшылар — экология жобаларына арналған нақты деректер."]]},
+  {id:"baikonur",r:"kyzylorda",ru:"Байконур",kk:"Байқоңыр",k:"town",lat:45.62,lon:63.31,
+   ex:[["Наука","Космодром Байконур","Музей космодрома и инженеры отрасли. Отличная тема для проектов по физике и космосу.","Байқоңыр ғарыш айлағы","Ғарыш айлағының музейі мен сала инженерлері. Физика мен ғарыш жобаларына тамаша тақырып."]]},
+
+  {id:"aktau",r:"mangystau",ru:"Актау",kk:"Ақтау",k:"center",lat:43.65,lon:51.17,nis:true,uni:["Каспийский университет технологий и инжиниринга им. Ш. Есенова","Ш. Есенов атындағы Каспий технологиялар және инжиниринг университеті"],
+   ex:[["Наука","Город пьёт опреснённую воду","Редкий пример инженерии прямо в твоём городе.","Қала тұщытылған су ішеді","Өз қалаңдағы инженерияның сирек мысалы."]]},
+  {id:"zhanaozen",r:"mangystau",ru:"Жанаозен",kk:"Жаңаөзен",k:"town",lat:43.34,lon:52.86},
+
+  {id:"pavlodar",r:"pavlodar",ru:"Павлодар",kk:"Павлодар",k:"center",lat:52.29,lon:76.97,nis:true,uni:["Торайгыров университет","Торайғыров университеті"],
+   ex:[["Кружки","Дворец школьников им. М.М. Катаева","Областной дворец: пение, танцы, IT, астрономия, экология. Летом бывает бесплатный набор для детей 6–17 лет.","М.М. Катаев атындағы оқушылар сарайы","Облыстық сарай: ән, би, IT, астрономия, экология. Жазда 6–17 жастағы балаларға тегін қабылдау болады."]]},
+  {id:"ekibastuz",r:"pavlodar",ru:"Экибастуз",kk:"Екібастұз",k:"town",lat:51.72,lon:75.32,
+   ex:[["Наука","Угольные разрезы и ГРЭС","Тема для проектов по энергетике и экологии.","Көмір разрездері және МАЭС","Энергетика мен экология жобаларына тақырып."]]},
+  {id:"aksu",r:"pavlodar",ru:"Аксу",kk:"Ақсу",k:"town",lat:52.04,lon:76.93},
+
+  {id:"petropavl",r:"north",ru:"Петропавловск",kk:"Петропавл",k:"center",lat:54.87,lon:69.15,nis:true,uni:["СКУ им. М. Козыбаева","М. Қозыбаев атындағы СҚУ"]},
+
+  {id:"turkestan",r:"turkistan",ru:"Туркестан",kk:"Түркістан",k:"center",lat:43.30,lon:68.27,nis:true,uni:["Международный казахско-турецкий университет им. Х.А. Ясави","Қ.А. Ясауи атындағы Халықаралық қазақ-түрік университеті"],
+   ex:[["История","Мавзолей Ходжи Ахмеда Ясави (ЮНЕСКО)","Проекты по истории, архитектуре и туризму.","Қожа Ахмет Ясауи кесенесі (ЮНЕСКО)","Тарих, сәулет және туризм бойынша жобалар."]]},
+  {id:"kentau",r:"turkistan",ru:"Кентау",kk:"Кентау",k:"town",lat:43.52,lon:68.51},
+  {id:"saryagash",r:"turkistan",ru:"Сарыагаш",kk:"Сарыағаш",k:"town",lat:41.46,lon:69.17},
+  {id:"arys",r:"turkistan",ru:"Арыс",kk:"Арыс",k:"town",lat:42.43,lon:68.81},
+
+  {id:"zhezkazgan",r:"ulytau",ru:"Жезказган",kk:"Жезқазған",k:"center",lat:47.80,lon:67.71,uni:["Жезказганский университет им. О.А. Байконурова","Ө.А. Байқоңыров атындағы Жезқазған университеті"],
+   ex:[["Наука","Медные рудники","Каныш Сатпаев открыл здешние месторождения. Наставники с производства и экскурсии рядом.","Мыс кеніштері","Қаныш Сәтбаев осындағы кен орындарын ашқан. Өндірістегі тәлімгерлер мен экскурсиялар жақын."]]},
+  {id:"satpayev",r:"ulytau",ru:"Сатпаев",kk:"Сәтбаев",k:"town",lat:47.90,lon:67.53},
+  {id:"karazhal",r:"ulytau",ru:"Каражал",kk:"Қаражал",k:"town",lat:48.00,lon:70.79},
+];
+for (const R of REGIONS){
+  if (["astana","almaty","shymkent"].includes(R.id)) continue;
+  const c = PLACES.find(p=>p.id===R.center);
+  PLACES.push({id:R.id+"-village",r:R.id,ru:"Село или посёлок",kk:"Ауыл немесе кент",k:"village",lat:c.lat,lon:c.lon});
+}
+const VOUCHER_PILOT = ["astana","shymkent","atyrau","aktobe","kyzylorda","karaganda"];
+
+// ── helpers
+const MON = {ru:["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"],kk:["қаңтар","ақпан","наурыз","сәуір","мамыр","маусым","шілде","тамыз","қыркүйек","қазан","қараша","желтоқсан"]};
+const MONs = {ru:["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"],kk:["қаң","ақп","нау","сәу","мам","мау","шіл","там","қыр","қаз","қар","жел"]};
+const LS = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+const SS = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const plural = (n,[a,b,c]) => { const m10=n%10, m100=n%100; return m10===1&&m100!==11?a:m10>=2&&m10<=4&&(m100<10||m100>=20)?b:c; };
+
+const state = { lang: LS("dada.lang") || "kk", grade: LS("dada.grade") ?? 0, place: LS("dada.place") || "semey", cat: "city", dir: "all", q: "", mine: true };
+if (!["ru","kk"].includes(state.lang)) state.lang = "kk";
+const KZ = () => state.lang==="kk";
+const tr = (ru,kk) => KZ() ? kk : ru;
+const ui = key => UI[key][state.lang];
+const v = s => KZ() ? (KK[s] ?? s) : s;
+const P = id => PLACES.find(p=>p.id===id);
+if (!P(state.place)) state.place = "semey";
+const place = () => P(state.place);
+const pname = p => p[state.lang];
+const rname = R => R[state.lang];
+const NOW = new Date().getMonth()+1;
+const nWord = (n, ru) => KZ() ? "" : " "+plural(n, ru);
+
+function km(a,b){
+  const t=Math.PI/180, dLat=(b.lat-a.lat)*t, dLon=(b.lon-a.lon)*t;
+  const h=Math.sin(dLat/2)**2+Math.cos(a.lat*t)*Math.cos(b.lat*t)*Math.sin(dLon/2)**2;
+  return Math.round(12742*Math.asin(Math.sqrt(h)));
+}
+function nearest(from, pred){
+  let best=null, d=Infinity;
+  for (const p of PLACES){ if (p.k==="village"||!pred(p)) continue; const x=km(from,p); if (x<d){d=x;best=p;} }
+  return best && {p:best, d};
+}
+// текст карточки на текущем языке
+function L(it){
+  if (it.c==="city" && !it.k) return it; // местные пункты уже собраны на нужном языке
+  return KZ() && it.k ? {...it,t:it.k[0],o:it.k[1],x:it.k[2],h:it.k[3],d:v(it.d),f:v(it.f),p:v(it.p)} : it;
+}
+
+// ── что есть в выбранном месте
+function localItems(pl){
+  const R = REGIONS.find(r=>r.id===pl.r), C = P(R.center);
+  const big = pl.k==="rep"||pl.k==="center", vill = pl.k==="village";
+  const out = [];
+  const add = (d,t,o,conf,x,h,extra={}) => out.push({c:"city",d:v(d),t,o,g:[5,11],m:ALL,f:"",p:"",conf,x,h,u:"",...extra});
+  const N = pname(pl), CN = pname(C), RN = rname(R);
+
+  add("Олимпиады",tr("Кружки и олимпиады в твоей школе","Мектебіңдегі үйірмелер мен олимпиадалар"),tr("Твоя школа","Сенің мектебің"),"sure",
+    tr("Школьный этап Республиканской олимпиады, «Бобёр», «Кенгуру» и научные проекты начинаются здесь. Школа обязана дать возможность участвовать.","Республикалық олимпиаданың мектеп кезеңі, «Бебрас», «Кенгуру» және ғылыми жобалар осы жерден басталады. Мектеп қатысуға мүмкіндік беруге міндетті."),
+    tr("Подойди к учителю по любимому предмету в сентябре–октябре.","Қыркүйек–қазан айларында сүйікті пәнің мұғаліміне бар."));
+  if (big) add("Олимпиады", tr(pl.k==="rep"?`Управление образования и центр «Дарын», ${N}`:`Областной центр «Дарын», ${N}`, pl.k==="rep"?`Білім басқармасы және «Дарын» орталығы, ${N}`:`Облыстық «Дарын» орталығы, ${N}`), RN,"sure",
+    tr("Проводит областной (городской) этап олимпиады в январе, конкурсы научных проектов и летние сборы для сильных учеников.","Қаңтарда олимпиаданың облыстық (қалалық) кезеңін, ғылыми жобалар байқауларын және мықты оқушыларға жазғы жиындарды өткізеді."),
+    tr("Следи за их соцсетями: там публикуют списки и даты этапов.","Олардың әлеуметтік желілерін бақыла: онда кезеңдердің тізімдері мен күндері жарияланады."));
+  else add("Олимпиады", vill ? tr("Районный отдел образования","Аудандық білім бөлімі") : tr(`Городской отдел образования, ${N}`,`Қалалық білім бөлімі, ${N}`), RN,"sure",
+    tr(`Через него проходит районный этап олимпиады (ноябрь–декабрь). Областной этап — в городе ${CN}, ~${km(pl,C)} км.`,`Олимпиаданың аудандық кезеңі (қараша–желтоқсан) осы арқылы өтеді. Облыстық кезең — ${CN} қаласында, ~${km(pl,C)} км.`),
+    tr("Спроси у учителя, когда районный этап и кто от школы едет.","Аудандық кезең қашан және мектептен кім баратынын мұғалімнен сұра."));
+
+  const vouch = VOUCHER_PILOT.includes(pl.id);
+  add("Бесплатные кружки",tr("Бесплатный кружок за счёт государства","Мемлекет есебінен тегін үйірме"),tr("Акимат, подушевое финансирование","Әкімдік, жан басына қаржыландыру"),vouch?"sure":"usual",
+    vouch ? tr(`В городе ${N} работает пилот ваучеров: один ребёнок получает один ваучер на бесплатный кружок или секцию через цифровую платформу.`,`${N} қаласында ваучерлердің пилоттық жобасы жүріп жатыр: бір бала цифрлық платформа арқылы тегін үйірмеге не секцияға бір ваучер алады.`)
+          : tr("Государство оплачивает школьникам кружки и секции в частных клубах. Список клубов и мест зависит от региона.","Мемлекет оқушыларға жеке клубтардағы үйірмелер мен секцияларды төлейді. Клубтар мен орындар тізімі өңірге байланысты."),
+    tr("Родители подают заявку с ИИН ребёнка через artsport.edu.kz или платформу акимата. Уточни в отделе образования.","Ата-ана баланың ЖСН-імен artsport.edu.kz немесе әкімдік платформасы арқылы өтінім береді. Білім бөлімінен нақтыла."),{u:"artsport.edu.kz"});
+
+  if (pl.nis) add("Сильные школы",tr(`НИШ, ${N}`,`НЗМ, ${N}`),tr("Назарбаев Интеллектуальная школа","Назарбаев Зияткерлік мектебі"),"sure",
+    tr("Поступление в 7 класс по экзамену в 6 классе. В НИШ проходят открытые олимпиады и мероприятия для школьников города.","7-сыныпқа 6-сыныптағы емтихан арқылы қабылдайды. НЗМ-де қала оқушыларына арналған ашық олимпиадалар мен іс-шаралар өтеді."),
+    tr("Смотри объявления о приёме на nis.edu.kz зимой.","Қыста nis.edu.kz сайтындағы қабылдау хабарландыруларын қара."),{u:"nis.edu.kz"});
+  else { const n = nearest(pl,p=>p.nis), NN = pname(n.p);
+    add("Сильные школы",tr(`Ближайший НИШ: ${NN}`,`Ең жақын НЗМ: ${NN}`),tr("Назарбаев Интеллектуальная школа","Назарбаев Зияткерлік мектебі"),"far",
+    tr(`${vill?"В селе":"В городе "+N} нет НИШ. Ближайший — в городе ${NN}, ~${n.d} км. Поступать можно из любого населённого пункта, у многих НИШ есть общежитие.`,`${vill?"Ауылда":N+" қаласында"} НЗМ жоқ. Ең жақыны — ${NN} қаласында, ~${n.d} км. Кез келген елді мекеннен түсуге болады, көп НЗМ-нің жатақханасы бар.`),
+    tr("Экзамен сдают в 6 классе. Регистрация зимой на nis.edu.kz.","Емтиханды 6-сыныпта тапсырады. Тіркеу қыста nis.edu.kz сайтында."),{u:"nis.edu.kz"}); }
+
+  add("Сильные школы",tr("Лицеи БИЛ в регионе","Өңірдегі БИЛ лицейлері"),tr("Білім-инновация лицеи","Білім-инновация лицейлері"),"usual",
+    tr("В каждой области есть лицеи сети БИЛ с сильной математикой и естественными науками. Многие с интернатом.","Әр облыста математикасы мен жаратылыстану ғылымдары күшті БИЛ лицейлері бар. Көбінде интернат бар."),
+    tr("Узнай в отделе образования, где ближайший БИЛ и когда набор (обычно весной, в 7 класс).","Ең жақын БИЛ қайда және қабылдау қашан екенін (әдетте көктемде, 7-сыныпқа) білім бөлімінен біл."));
+
+  if (pl.uni) add("Вузы",tr(`Вузы: ${N}`,`ЖОО: ${N}`),pl.uni[KZ()?1:0],"sure",
+    tr("Кафедры вузов могут стать научными руководителями проекта, пустить в лаборатории и провести день открытых дверей.","ЖОО кафедралары жобаңның ғылыми жетекшісі бола алады, зертханаларға кіргізіп, ашық есік күнін өткізеді."),
+    tr("Напиши на кафедру по теме твоего проекта: школьникам часто помогают бесплатно.","Жобаңның тақырыбы бойынша кафедраға жаз: оқушыларға жиі тегін көмектеседі."));
+  else { const n = nearest(pl,p=>!!p.uni); if (n) add("Вузы",tr(`Ближайшие вузы: ${pname(n.p)}`,`Ең жақын ЖОО: ${pname(n.p)}`),n.p.uni[KZ()?1:0],"far",
+    tr(`~${n.d} км. Научного руководителя можно найти и онлайн: напиши преподавателю по почте.`,`~${n.d} км. Ғылыми жетекшіні онлайн да табуға болады: оқытушыға пошта арқылы жаз.`),
+    tr("Найди на сайте вуза преподавателя по своей теме и напиши ему.","ЖОО сайтынан өз тақырыбың бойынша оқытушыны тауып, оған жаз.")); }
+
+  add("Кружки", big ? tr("Дворец школьников / центр детского творчества","Оқушылар сарайы / балалар шығармашылығы орталығы") : vill ? tr("Дом детского творчества в районном центре","Аудан орталығындағы балалар шығармашылығы үйі") : tr(`Дом детского творчества, ${N}`,`Балалар шығармашылығы үйі, ${N}`), tr("Государственные кружки","Мемлекеттік үйірмелер"),"usual",
+    tr("Робототехника, шахматы, рисование, танцы, иногда математика и языки. Большинство кружков бесплатные.","Робототехника, шахмат, сурет, би, кейде математика мен тілдер. Үйірмелердің көбі тегін."),
+    tr("Запись обычно в августе–сентябре. Спроси расписание по телефону.","Жазылу әдетте тамыз–қыркүйекте. Кестені телефонмен сұра."));
+  if (big) add("Кружки",tr("Станции юных техников и натуралистов","Жас техниктер мен натуралистер станциялары"),tr("Городские и областные станции","Қалалық және облыстық станциялар"),"usual",
+    tr("Техническое творчество, моделирование, биология и экология на практике.","Техникалық шығармашылық, модельдеу, практикадағы биология мен экология."),tr("Узнай адрес в управлении образования.","Мекенжайын білім басқармасынан біл."));
+  add("Языки", big ? tr("Областная библиотека","Облыстық кітапхана") : vill ? tr("Сельская библиотека","Ауылдық кітапхана") : tr("Городская библиотека","Қалалық кітапхана"),tr("Библиотека","Кітапхана"),"usual",
+    big ? tr("Часто проводит разговорные клубы английского, книжные клубы и даёт бесплатный доступ к интернету.","Жиі ағылшын тілінде сөйлесу клубтарын, кітап клубтарын өткізеді, тегін интернет береді.") : tr("Книги, бесплатный интернет, иногда клубы чтения. Можно предложить свой английский клуб.","Кітаптар, тегін интернет, кейде оқу клубтары. Өзіңнің ағылшын клубыңды ұсына аласың."),
+    tr("Спроси, какие клубы работают, или предложи создать свой.","Қандай клубтар жұмыс істейтінін сұра немесе өзіңдікін құруды ұсын."));
+  if (!vill) add("Творчество",tr("Школа искусств и музыкальная школа","Өнер мектебі және музыка мектебі"),tr("Детские школы искусств","Балалар өнер мектептері"),"usual",
+    tr("Музыка, рисование, дизайн. Творческое портфолио пригодится для архитектуры и дизайна.","Музыка, сурет, дизайн. Шығармашылық портфолио сәулет пен дизайнға пайдалы."),tr("Набор в конце августа.","Қабылдау тамыздың соңында."));
+  else add("Творчество",tr("Дом культуры","Мәдениет үйі"),tr("Сельский дом культуры","Ауылдық мәдениет үйі"),"usual",tr("Кружки музыки, танцев и театра.","Музыка, би және театр үйірмелері."),tr("Спроси в акимате села.","Ауыл әкімдігінен сұра."));
+  add("Волонтёрство",tr("Молодёжный ресурсный центр","Жастар ресурстық орталығы"),tr(`При акимате, ${RN}`,`Әкімдік жанында, ${RN}`),"usual",
+    tr("Волонтёрские проекты, тренинги, форумы для молодёжи.","Еріктілер жобалары, тренингтер, жастар форумдары."),tr("Подпишись на их соцсети.","Олардың әлеуметтік желілеріне жазыл."));
+
+  for (const [d,t,x,tk,xk] of (pl.ex||[])) add(d,tr(t,tk),N,"sure",tr(x,xk),tr("Спроси в школе, можно ли организовать экскурсию или найти наставника.","Экскурсия ұйымдастыруға немесе тәлімгер табуға бола ма, мектептен сұра."));
+
+  // сети и институты, которые есть именно здесь (American Corner, KIBERone, Конфуций, Балдаурен…)
+  if (!vill) for (const it of ITEMS) if (typeof it.w==="object" && it.w.cities.includes(pl.id)){ const l = L(it); out.push({...l,c:"city",d:v(it.d),conf:"sure",k:undefined,f:l.f,p:l.p,net:true}); }
+
+  add("Проекты",tr(`Идея проекта: ${R.e[0]}`,`Жоба идеясы: ${R.e[2]}`),tr(`Только в регионе: ${RN}`,`Тек осы өңірде: ${RN}`),"sure",tr(R.e[1],R.e[3]),
+    tr("Возьми эту тему на конкурс «Зерде» (5–7 класс) или научных проектов «Дарын» (8–11 класс).","Бұл тақырыпты «Зерде» (5–7 сынып) немесе «Дарын» ғылыми жобалар (8–11 сынып) байқауына ал."));
+  if (vill) add("Онлайн",tr("Онлайн вместо поездок","Сапардың орнына онлайн"),"Khan Academy, Stepik, Codeforces, Bilimland","sure",
+    tr("Всё онлайн из каталога доступно и в селе: олимпиадная подготовка, языки, программирование. Нужен только интернет.","Каталогтағы онлайн нәрселердің бәрі ауылда да қолжетімді: олимпиадаға дайындық, тілдер, бағдарламалау. Тек интернет керек."),
+    tr("Открой категории «Математика» и «Программирование» и выбери то, что с пометкой «Онлайн».","«Математика» және «Бағдарламалау» санаттарын ашып, «Онлайн» белгісі барын таңда."));
+  return out;
+}
+
+function whereInfo(it, pl){
+  const w = it.w, N = pname(pl);
+  if (w==="o") return {cls:"here",label:tr("Онлайн, доступно из любого места","Онлайн, кез келген жерден қолжетімді"),ok:true};
+  if (w==="s") return {cls:"here",label:tr("Через твою школу","Мектебің арқылы"),ok:true};
+  if (w==="a") return {cls:"",label:tr("Заявка онлайн, программа за рубежом","Өтінім онлайн, бағдарлама шетелде"),ok:true};
+  if (w==="c") return pl.k==="village" ? {cls:"near",label:tr("Обычно есть в районном центре","Әдетте аудан орталығында бар"),ok:true}
+                                       : {cls:"here",label:tr(`Обычно есть в городе ${N}, уточни адрес`,`Әдетте ${N} қаласында бар, мекенжайын нақтыла`),ok:true};
+  const hereFn = w==="r" ? p=>p.k==="rep"||p.k==="center" : w==="nis" ? p=>p.nis : p=>w.cities.includes(p.id);
+  if (pl.k!=="village" && hereFn(pl)) return {cls:"here",label:tr(`Есть в городе ${N}`,`${N} қаласында бар`),ok:true};
+  const n = nearest(pl, hereFn);
+  const also = typeof w==="object" && w.on ? tr(" · есть онлайн"," · онлайн бар") : "";
+  return {cls:n.d<=200?"near":"", label:tr(`Ближайшее: ${pname(n.p)}, ~${n.d} км`,`Ең жақыны: ${pname(n.p)}, ~${n.d} км`)+also, ok:n.d<=200||!!also};
+}
+
+function status(it){
+  if (it.m.length===12) return {k:"now",label:tr("Круглый год","Жыл бойы"),d:0};
+  if (it.m.includes(NOW)) return {k:"now",label:tr("Идёт сейчас","Қазір өтіп жатыр"),d:0};
+  let d = 1; while (!it.m.includes(((NOW-1+d)%12)+1)) d++;
+  return {k:d<=2?"soon":"",label:d===1?tr("В следующем месяце","Келесі айда"):tr(`Через ${d} ${plural(d,["месяц","месяца","месяцев"])}`,`${d} айдан кейін`),d};
+}
+const CONF = {sure:["Точно есть","Нақты бар"],usual:["Обычно есть, уточни","Әдетте бар, нақтыла"],far:["Нет рядом","Жақын жерде жоқ"]};
+function monthsText(m){
+  if (m.length===12) return tr("круглый год","жыл бойы");
+  const order = [9,10,11,12,1,2,3,4,5,6,7,8];
+  const s = [...m].sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+  return s.length===1 ? MON[state.lang][s[0]-1] : s.map(x=>MONs[state.lang][x-1]).join(", ");
+}
+const fitsGrade = it => !state.grade || (state.grade>=it.g[0] && state.grade<=it.g[1]);
+const colorVars = id => `--cc:var(--c-${id});--ct:var(--t-${id})`;
+const PIN = `<svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" fill="currentColor"/><circle cx="12" cy="10" r="2.6" fill="var(--surface)"/></svg>`;
+const catName = c => c[state.lang][0], catDesc = c => c[state.lang][1];
+
+// ── render
+function renderStatic(){
+  document.documentElement.lang = state.lang;
+  document.getElementById("tagline").textContent = ui("tagline");
+  document.getElementById("lblLive").textContent = ui("live");
+  document.getElementById("lblGrade").textContent = ui("grade");
+  document.getElementById("catsTitle").textContent = ui("cats");
+  document.getElementById("catHint").textContent = ui("catHint");
+  document.getElementById("footer").textContent = ui("footer");
+  document.getElementById("q").placeholder = ui("search");
+  document.getElementById("regionSel").setAttribute("aria-label", tr("Область","Облыс"));
+  document.getElementById("placeSel").setAttribute("aria-label", tr("Город или село","Қала немесе ауыл"));
+  document.getElementById("grades").setAttribute("aria-label", tr("Класс","Сынып"));
+  for (const l of ["kk","ru"]) document.getElementById("lang-"+l).setAttribute("aria-pressed", state.lang===l);
+}
+function renderLocation(){
+  const rs = document.getElementById("regionSel"), ps = document.getElementById("placeSel"), pl = place();
+  rs.innerHTML = REGIONS.map(r=>`<option value="${r.id}">${esc(rname(r))}</option>`).join("");
+  rs.value = pl.r;
+  const list = PLACES.filter(p=>p.r===pl.r);
+  ps.innerHTML = list.map(p=>`<option value="${p.id}">${esc(pname(p))}${p.k==="center"?" "+ui("center"):""}</option>`).join("");
+  ps.value = pl.id; ps.disabled = list.length===1;
+}
+function renderGrades(){
+  document.getElementById("grades").innerHTML = [0,5,6,7,8,9,10,11].map(g=>`<button type="button" class="gbtn" id="grade-${g}" data-g="${g}" aria-pressed="${state.grade===g}">${g||ui("all")}<small>${g?ui("cls"):ui("clsPl")}</small></button>`).join("");
+  const pl = place(), N = pname(pl);
+  const n = ITEMS.filter(i=>fitsGrade(i) && whereInfo(i,pl).ok).length + localItems(pl).filter(i=>!i.net).length;
+  const who = state.grade ? tr(`Для ${state.grade} класса`,`${state.grade}-сынып үшін`) : tr("Для всех классов","Барлық сыныптар үшін");
+  const where = pl.k==="village" ? tr("в твоём районе","ауданыңда") : tr(`в городе ${N}`,`${N} қаласында`);
+  document.getElementById("gradeHint").textContent = tr(`${who} ${where} доступно ${n}${nWord(n,["вариант","варианта","вариантов"])}.`,`${who} ${where} ${n} мүмкіндік бар.`);
+}
+function renderCats(){
+  const pl = place();
+  document.getElementById("cats").innerHTML = CATS.map(c=>{
+    const pressed = state.cat===c.id && !state.q;
+    if (c.id==="city"){
+      const n = localItems(pl).length;
+      const title = pl.k==="village" ? tr("В моём селе и районе","Менің ауылым мен ауданымда") : tr(`В моём городе: ${pname(pl)}`,`Менің қаламда: ${pname(pl)}`);
+      return `<button type="button" class="cat city" id="cat-city" data-c="city" style="${colorVars("city")}" aria-pressed="${pressed}">
+        <span class="pins" aria-hidden="true"><i style="background:var(--c-olymp)"></i><i style="background:var(--c-lang)"></i><i style="background:var(--c-club)"></i><i style="background:var(--c-code)"></i><i style="background:var(--c-summer)"></i></span>
+        <span><span class="name">${esc(title)}</span><br><span class="count">${tr(`${n} ${plural(n,["возможность","возможности","возможностей"])} рядом: школы, вузы, кружки, олимпиады`,`Жақын жерде ${n} мүмкіндік: мектептер, ЖОО, үйірмелер, олимпиадалар`)}</span></span>
+      </button>`;
+    }
+    const n = ITEMS.filter(i=>i.c===c.id && fitsGrade(i) && (!state.mine || whereInfo(i,pl).ok)).length;
+    return `<button type="button" class="cat" id="cat-${c.id}" data-c="${c.id}" style="${colorVars(c.id)}" aria-pressed="${pressed}">
+      <span class="glyph" aria-hidden="true">${c.glyph}</span>
+      <span><span class="name">${catName(c)}</span><br><span class="count">${tr(`${n} ${plural(n,["вариант","варианта","вариантов"])}`,`${n} мүмкіндік`)}${state.grade?tr(` для ${state.grade} кл.`,` · ${state.grade}-сынып`):""}</span></span>
+    </button>`;
+  }).join("");
+}
+function card(raw, catId){
+  const it = L(raw), pl = place();
+  const st = it.conf ? {k:it.conf,label:CONF[it.conf][KZ()?1:0]} : status(it);
+  const wi = it.c==="city" ? null : whereInfo(raw,pl);
+  const cells = [5,6,7,8,9,10,11].map(g=>`<i class="${g>=it.g[0]&&g<=it.g[1]?"in":""} ${g===state.grade?"me":""}">${g}</i>`).join("");
+  const gtxt = it.g[0]===it.g[1] ? tr(`Только ${it.g[0]} класс`,`Тек ${it.g[0]}-сынып`) : tr(`С ${it.g[0]} по ${it.g[1]} класс`,`${it.g[0]}–${it.g[1]} сыныптар`);
+  const facts = it.conf && !it.net ? [it.d] : [it.d, monthsText(it.m), it.f, it.p];
+  return `<article class="item" style="${colorVars(catId||it.c)}">
+    <div class="item-top">
+      <div><h3>${esc(it.t)}</h3><div class="org">${esc(it.o)}</div></div>
+      <span class="status ${st.k}">${st.label}</span>
+    </div>
+    ${wi?`<div class="where ${wi.cls}">${PIN}${esc(wi.label)}</div>`:""}
+    <div class="gstrip"><div class="row" aria-hidden="true">${cells}</div><span class="cap">${gtxt}</span></div>
+    <div class="facts">${facts.filter(Boolean).map(f=>`<span class="fact">${esc(f)}</span>`).join("")}</div>
+    <p>${esc(it.x)}</p>
+    <p class="how"><b>${ui("howStart")}</b> ${esc(it.h)}</p>
+    ${it.u?`<div class="src"><a href="https://${esc(it.u)}" target="_blank" rel="noopener">${esc(it.u)} ↗</a></div>`:""}
+  </article>`;
+}
+function chips(dirs){
+  return `<div class="dfilters" role="group" aria-label="${tr("Направление","Бағыт")}">
+    ${["all",...dirs].map(d=>`<button type="button" class="chip" data-d="${esc(d)}" aria-pressed="${state.dir===d}">${d==="all"?ui("allDirs"):esc(KZ()?v(d):d)}</button>`).join("")}</div>`;
+}
+function renderDetail(){
+  const el = document.getElementById("detail"), pl = place(), N = pname(pl);
+  if (state.q){
+    const q = state.q.toLowerCase();
+    const res = [...localItems(pl).filter(i=>!i.net), ...ITEMS].filter(i=>{ const l = L(i); return fitsGrade(i) && [l.t,l.o,l.d,l.x,i.t].join(" ").toLowerCase().includes(q); });
+    el.setAttribute("style","--cc:var(--violet);--ct:#fff");
+    el.innerHTML = `<div class="dhead"><h2>${tr("Поиск","Іздеу")}: «${esc(state.q)}»</h2><p>${tr(`${res.length} ${plural(res.length,["результат","результата","результатов"])} во всех категориях`,`Барлық санаттарда ${res.length} нәтиже`)}${state.grade?tr(` для ${state.grade} класса`,` (${state.grade}-сынып)`):""}.</p></div>
+      <div class="dbody">${res.length?`<div class="items">${res.map(i=>card(i)).join("")}</div>`:`<div class="empty">${tr("Ничего не нашлось. Попробуй другое слово или выбери «Все» классы.","Ештеңе табылмады. Басқа сөзбен іздеп көр немесе «Барлығы» сыныптарын таңда.")}</div>`}</div>`;
+    return;
+  }
+  const c = CATS.find(x=>x.id===state.cat);
+  if (c.id==="city"){
+    const R = REGIONS.find(r=>r.id===pl.r), C = P(R.center);
+    const all = localItems(pl);
+    const dirs = [...new Set(all.map(i=>i.d))];
+    if (state.dir!=="all" && !dirs.includes(state.dir)) state.dir = "all";
+    const order = {sure:0,usual:1,far:2};
+    const list = all.filter(i=>state.dir==="all"||i.d===state.dir).sort((a,b)=>order[a.conf]-order[b.conf]);
+    const dist = pl.k==="rep" ? "" : tr(` · областной центр: ${pname(C)}${pl.id!==C.id?`, ~${km(pl,C)} км`:""}`,` · облыс орталығы: ${pname(C)}${pl.id!==C.id?`, ~${km(pl,C)} км`:""}`);
+    el.setAttribute("style", colorVars("city"));
+    el.innerHTML = `<div class="dhead">
+        <h2>${pl.k==="village"?tr("Твоё село и район","Сенің ауылың мен ауданың"):esc(N)}</h2>
+        <p>${esc(rname(R))}${dist}. ${tr("Здесь всё, что есть рядом с тобой: школы, вузы, кружки, сети вроде American Corner и KIBERone, этапы олимпиад и идея проекта, которая есть только в твоём регионе.","Мұнда жаныңдағының бәрі бар: мектептер, ЖОО, үйірмелер, American Corner және KIBERone сияқты желілер, олимпиада кезеңдері және тек сенің өңіріңе тән жоба идеясы.")}</p>
+        ${chips(dirs)}
+      </div>
+      <div class="dbody">
+        <div class="summary">
+          <span>${CONF.sure[KZ()?1:0]}: <b>${all.filter(i=>i.conf==="sure").length}</b></span>
+          <span>${CONF.usual[KZ()?1:0]}: <b>${all.filter(i=>i.conf==="usual").length}</b></span>
+          <span>${tr("Онлайн из каталога","Каталогтағы онлайн")}: <b>${ITEMS.filter(i=>i.w==="o"&&fitsGrade(i)).length}</b></span>
+        </div>
+        <div class="items">${list.map(i=>card(i,"city")).join("")}</div>
+      </div>`;
+    return;
+  }
+  const all = ITEMS.filter(i=>i.c===c.id);
+  const dirs = [...new Set(all.map(i=>i.d))];
+  if (state.dir!=="all" && !dirs.includes(state.dir)) state.dir = "all";
+  const base = all.filter(i=>fitsGrade(i) && (state.dir==="all"||i.d===state.dir));
+  const list = base.filter(i=>!state.mine || whereInfo(i,pl).ok).sort((a,b)=>status(a).d-status(b).d || a.g[0]-b.g[0]);
+  const hidden = base.length - list.length;
+  const hereN = list.filter(i=>whereInfo(i,pl).cls==="here").length;
+  el.setAttribute("style", colorVars(c.id));
+  el.innerHTML = `<div class="dhead">
+      <h2>${catName(c)}</h2>
+      <p>${catDesc(c)}</p>
+      ${chips(dirs)}
+    </div>
+    <div class="dbody">
+      <div class="summary">
+        <span>${tr("Показано","Көрсетілді")}: <b>${list.length}</b></span>
+        <span>${pl.k==="village"?tr("Доступно из села или онлайн","Ауылдан немесе онлайн қолжетімді"):tr(`Доступно в городе ${N} или онлайн`,`${N} қаласында немесе онлайн қолжетімді`)}: <b>${hereN}</b></span>
+        <span>${tr("Идёт сейчас","Қазір өтіп жатыр")}: <b>${list.filter(i=>status(i).d===0).length}</b></span>
+        <span>${tr("Бесплатно","Тегін")}: <b>${list.filter(i=>/бесплатно/i.test(i.p)).length}</b></span>
+      </div>
+      <label class="toggle" for="mine"><input type="checkbox" id="mine" ${state.mine?"checked":""}> ${ui("onlyMine")}</label>
+      ${hidden?`<div class="hidden-note">${tr(`Ещё ${hidden} ${plural(hidden,["вариант","варианта","вариантов"])} только в других городах дальше 200 км.`,`Тағы ${hidden} мүмкіндік тек 200 км-ден алыс басқа қалаларда.`)} <button type="button" id="showAll">${ui("show")}</button></div>`:""}
+      ${list.length?`<div class="items">${list.map(i=>card(i,c.id)).join("")}</div>`:`<div class="empty">${tr("Здесь пока ничего не подходит. Выбери другой класс или направление.","Мұнда әзірге ештеңе сәйкес келмейді. Басқа сынып немесе бағыт таңда.")}</div>`}
+    </div>`;
+}
+function renderAll(){ renderStatic(); renderLocation(); renderGrades(); renderCats(); renderDetail(); }
+
+// ── events
+const pickPlace = id => { state.place = id; SS("dada.place", id); state.cat = "city"; state.dir = "all"; renderAll(); };
+document.getElementById("regionSel").addEventListener("change", e=> pickPlace(REGIONS.find(r=>r.id===e.target.value).center));
+document.getElementById("placeSel").addEventListener("change", e=> pickPlace(e.target.value));
+document.querySelector(".langs").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  state.lang = b.dataset.l; SS("dada.lang", state.lang); state.dir = "all"; renderAll();
+});
+document.getElementById("grades").addEventListener("click", e=>{
+  const b = e.target.closest(".gbtn"); if(!b) return;
+  state.grade = +b.dataset.g; SS("dada.grade", state.grade); renderGrades(); renderCats(); renderDetail();
+});
+document.getElementById("cats").addEventListener("click", e=>{
+  const b = e.target.closest(".cat"); if(!b) return;
+  state.cat = b.dataset.c; state.dir = "all"; state.q = ""; document.getElementById("q").value = "";
+  renderCats(); renderDetail();
+  document.getElementById("detail").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth", block:"start"});
+});
+document.getElementById("detail").addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if (b){ state.dir = b.dataset.d; renderDetail(); return; }
+  if (e.target.id==="showAll"){ state.mine = false; renderCats(); renderDetail(); }
+});
+document.getElementById("detail").addEventListener("change", e=>{
+  if (e.target.id==="mine"){ state.mine = e.target.checked; renderCats(); renderDetail(); }
+});
+document.getElementById("q").addEventListener("input", e=>{ state.q = e.target.value.trim(); renderCats(); renderDetail(); });
+
+if (![0,5,6,7,8,9,10,11].includes(state.grade)) state.grade = 0;
+renderAll();
+</script>
+
+</body>
+</html>
